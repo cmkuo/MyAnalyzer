@@ -1,2 +1,6 @@
 README
 currently on CMSSW_7_3_2_patch4
+
+run xFitShape to extract timing
+https://github.com/cmkuo/MyAnalyzer/tree/master/ESAnalyzer/test/splash/ana
+draw the event display using xEventDisplay.C
