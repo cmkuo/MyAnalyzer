@@ -1,5 +1,8 @@
 README
-currently on CMSSW_7_3_2_patch4
+1. miniDAQ raw data needs CMSSW_7_2_1
+2. global run raw data needs CMSSW_7_3_2_patch4
+
+test.py can be used for minidaq data.
 
 run xFitShape to extract timing
 https://github.com/cmkuo/MyAnalyzer/tree/master/ESAnalyzer/test/splash/ana
