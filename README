@@ -2,8 +2,10 @@ README
 1. miniDAQ raw data needs CMSSW_7_2_1
 2. global run raw data needs CMSSW_7_3_2_patch4
 
-test.py can be used for minidaq data.
+To analyze splash events:
 
-run xFitShape to extract timing
+test/splash/test.py can be used for minidaq data.
+
+run xFitShape in test/splash/ana to extract timing
 https://github.com/cmkuo/MyAnalyzer/tree/master/ESAnalyzer/test/splash/ana
 draw the event display using xEventDisplay.C
