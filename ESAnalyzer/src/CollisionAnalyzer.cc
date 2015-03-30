@@ -685,6 +685,64 @@ void CollisionAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup&
 
   }
 
+  TrackDetectorAssociator::Direction direction = TrackDetectorAssociator::InsideOut;
+  // Get muon's information
+  nMu = 0;
+  Handle<reco::MuonCollection> Muons;
+  if ( iEvent.getByLabel("muons", Muons)) {
+    const reco::MuonCollection *muons = Muons.product();
+    for (reco::MuonCollection::const_iterator aMu = muons->begin(); aMu != muons->end(); aMu++) {
+
+      muPt[nMu]  = aMu->pt();
+      muEta[nMu] = aMu->eta();
+      muPhi[nMu] = aMu->phi(); 
+      
+      muIsoTrk[nMu]  = aMu->isolationR03().trackerVetoPt;
+      muIsoEcal[nMu] = aMu->isolationR03().emVetoEt;
+      muIsoHcal[nMu] = aMu->isolationR03().hadVetoEt;
+      
+      muGlobal[nMu]     = aMu->isGlobalMuon();
+      muTracker[nMu]    = aMu->isTrackerMuon();
+      muStandAlone[nMu] = aMu->isStandAloneMuon();
+      
+      for (int ip=0; ip<2; ++ip) {
+	muESz[nMu][ip] = -99;
+	muESp[nMu][ip] = -99;
+	muESx[nMu][ip] = -99;
+	muESy[nMu][ip] = -99;
+	muESs[nMu][ip] = -99;
+      }
+
+      if (aMu->pt() < 1) continue;
+      if (!IsCosmic_ && fabs(aMu->vertex().rho()) > 50) continue;
+
+      // start track association
+      TrackDetMatchInfo info;
+      if (aMu->innerTrack().isAvailable()) {
+	info = trackAssociator_.associate(iEvent, iSetup, *aMu->innerTrack(), parameters_, direction);
+      } else {
+	if (!aMu->outerTrack().isAvailable()) {
+	  LogVerbatim("TrackAssociator") << "No refernced tracks are available, skim the muon";
+	  continue;
+	}
+	info = trackAssociator_.associate(iEvent, iSetup, *aMu->outerTrack(), parameters_, direction);
+      }
+
+      for (std::vector<DetId>::const_iterator id = info.crossedPreshowerIds.begin(); id != info.crossedPreshowerIds.end(); ++id) {
+	//GlobalPoint point = info.getPosition(*id);
+	ESDetId esid (id->rawId()) ;
+	muESz[nMu][esid.plane()-1] = esid.zside();
+	muESp[nMu][esid.plane()-1] = esid.plane();
+	muESx[nMu][esid.plane()-1] = esid.six();
+	muESy[nMu][esid.plane()-1] = esid.siy();
+	muESs[nMu][esid.plane()-1] = esid.strip();
+	//cout<<"ES : "<<esid.zside()<<" "<<esid.plane()<<" "<<esid.six()<<" "<<esid.siy()<<" "<<esid.strip()<<endl;
+      }
+      
+      nMu++;    
+    }
+  }
+
   tree_->Fill();
 }
 
