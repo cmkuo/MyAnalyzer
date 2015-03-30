@@ -21,3 +21,10 @@ the analyzer is ESAnalyzer/src/CollisionAnalyzer.cc
 the py file is ESAnalyzer/test/commissioning_2015.py for FEVT data and ESAnalyzer/test/commissioning_raw_2015.py for raw data
 
 
+
+>> To launch jobs on lxbatch:
+work forder is MyAnalyzer/ESAnalyzer/test/Run_lxbatch_jobs
+     update in/out path and decide files splitting in params_lxbatch.CFG
+     prepare list of .root files as in runList_LSF.txt
+     prepare jobs with "perl launchJobs_lxbatch_LSF.pl params_lxbatch.CFG"
+     launch jobs with "source launch.sh"
