@@ -11,10 +11,12 @@
 #include "DataFormats/EcalDetId/interface/ESDetId.h"
 #include "DataFormats/EcalDigi/interface/ESDataFrame.h"
 #include "DataFormats/EcalDigi/interface/EcalDigiCollections.h"
-
 #include "DataFormats/EcalRawData/interface/ESDCCHeaderBlock.h"
 #include "DataFormats/EcalRawData/interface/ESKCHIPBlock.h"
 #include "DataFormats/EcalRawData/interface/EcalRawDataCollections.h"
+#include "DataFormats/EcalRecHit/interface/EcalRecHitCollections.h"
+#include "DataFormats/HcalRecHit/interface/HcalRecHitCollections.h"
+#include "DataFormats/HcalDetId/interface/HcalDetId.h"
 
 #include "TFile.h"
 #include "TH1F.h"
@@ -45,6 +47,9 @@ class ESSplashAnalyzer : public edm::EDAnalyzer {
   string outputFile_;
   string hotFile_;
   InputTag digilabel_;
+  InputTag rechitlabel_;
+  InputTag eerechitlabel_;
+  InputTag herechitlabel_;
   bool dumpTree_;
   FileInPath lookup_;
 
@@ -62,17 +67,25 @@ class ESSplashAnalyzer : public edm::EDAnalyzer {
   int cADC0_[2][2][40][40][32]; 
   int cADC1_[2][2][40][40][32]; 
   int cADC2_[2][2][40][40][32]; 
+  double RH_[2][2][40][40][32];
+  double en_eep;
+  double en_eem;
+  double en_hep;
+  double en_hem;
 
   int hotChannels_, hotZ[5000], hotP[5000], hotX[5000], hotY[5000], hotS[5000];
 };
 
 ESSplashAnalyzer::ESSplashAnalyzer(const edm::ParameterSet& ps) {
   
-  outputFile_   = ps.getUntrackedParameter<string>("OutputFile");
-  hotFile_      = ps.getUntrackedParameter<string>("HotChannelFile");
-  digilabel_    = ps.getParameter<InputTag>("DigiLabel");
-  lookup_       = ps.getUntrackedParameter<FileInPath>("LookupTable");
-  dumpTree_     = ps.getUntrackedParameter<bool>("DumpTree", false);
+  outputFile_     = ps.getUntrackedParameter<string>("OutputFile");
+  hotFile_        = ps.getUntrackedParameter<string>("HotChannelFile");
+  digilabel_      = ps.getParameter<InputTag>("DigiLabel");
+  rechitlabel_    = ps.getParameter<InputTag>("RecHitLabel");
+  eerechitlabel_  = ps.getParameter<InputTag>("EERecHitLabel");
+  herechitlabel_  = ps.getParameter<InputTag>("HERecHitLabel");
+  lookup_         = ps.getUntrackedParameter<FileInPath>("LookupTable");
+  dumpTree_       = ps.getUntrackedParameter<bool>("DumpTree", false);
 
   // read in hot channel map
   ifstream hotFile;
@@ -138,6 +151,11 @@ ESSplashAnalyzer::ESSplashAnalyzer(const edm::ParameterSet& ps) {
     tree_->Branch("cADC0", cADC0_, "cADC0[2][2][40][40][32]/I");
     tree_->Branch("cADC1", cADC1_, "cADC1[2][2][40][40][32]/I");
     tree_->Branch("cADC2", cADC2_, "cADC2[2][2][40][40][32]/I");
+    tree_->Branch("RH", RH_, "RH[2][2][40][40][32]/D");
+    tree_->Branch("eep", &en_eep, "eep/D");
+    tree_->Branch("eem", &en_eem, "eem/D");
+    tree_->Branch("hep", &en_hep, "hep/D");
+    tree_->Branch("hem", &en_hem, "hem/D");
   }
 
 }
@@ -163,16 +181,18 @@ ESSplashAnalyzer::~ESSplashAnalyzer() {
 void ESSplashAnalyzer::analyze(const edm::Event& e, const edm::EventSetup& iSetup) {
 
   runNum_ = e.id().run();
-  evNum_  = e.id().event();
+  evNum_ = e.id().event();
+  orbit_ = e.orbitNumber();
+  bx_ = e.bunchCrossing();
   eCount_++;
-
+  /*
   Handle<ESRawDataCollection> dccs;
   try {
     e.getByLabel(digilabel_, dccs);
   } catch ( cms::Exception &e ) {
     LogDebug("") << "Error! can't get ES raw data collection !" << std::endl;
   }
-
+  */
   Handle<ESDigiCollection> digis;
   try {
     e.getByLabel(digilabel_, digis);
@@ -180,12 +200,11 @@ void ESSplashAnalyzer::analyze(const edm::Event& e, const edm::EventSetup& iSetu
     LogDebug("") << "Error! can't get digi collection !" << std::endl;
   }
 
-  for (ESRawDataCollection::const_iterator dccItr = dccs->begin(); dccItr != dccs->end(); ++dccItr) {
-    ESDCCHeaderBlock dcc = (*dccItr);
-    bx_    = dcc.getBX();
-    orbit_ = dcc.getOrbitNumber();
-    //cout<<bx_<<" "<<orbit_<<endl;
-  }
+  //for (ESRawDataCollection::const_iterator dccItr = dccs->begin(); dccItr != dccs->end(); ++dccItr) {
+  //ESDCCHeaderBlock dcc = (*dccItr);
+  //bx_    = dcc.getBX();
+  //orbit_ = dcc.getOrbitNumber();
+  //}
   
   // Digis
   //Need for storing original data
@@ -212,7 +231,13 @@ void ESSplashAnalyzer::analyze(const edm::Event& e, const edm::EventSetup& iSetu
 	    cADC0_[j][k][m][n][o] = -999999;
 	    cADC1_[j][k][m][n][o] = -999999;
 	    cADC2_[j][k][m][n][o] = -999999;
+	    RH_[j][k][m][n][o] = -999999;
           }
+
+  en_eep = 0;
+  en_eem = 0;
+  en_hep = 0;
+  en_hem = 0;
 
   int zside, plane, ix, iy, strip, iz;
   for (ESDigiCollection::const_iterator digiItr = digis->begin(); digiItr != digis->end(); ++digiItr) {
@@ -272,8 +297,10 @@ void ESSplashAnalyzer::analyze(const edm::Event& e, const edm::EventSetup& iSetu
       }
     } 
 
+    //int cm1, cm2, cm3;    
     DoCommonMode(sensor_data_CM_S0, &cm);
     hcm_[iz][senP_[i]-1][senX_[i]-1][senY_[i]-1]->Fill(cm);  //Fill CM histos per sensor
+    //cm1 = cm;
     for (int is=0; is<32; ++is) {
       sensor_data_S0[is] -= cm;
       cADC0_[iz][senP_[i]-1][senX_[i]-1][senY_[i]-1][is] = sensor_data_S0[is];
@@ -281,6 +308,7 @@ void ESSplashAnalyzer::analyze(const edm::Event& e, const edm::EventSetup& iSetu
     
     DoCommonMode(sensor_data_CM_S1, &cm);
     hcm_[iz][senP_[i]-1][senX_[i]-1][senY_[i]-1]->Fill(cm);  //Fill CM histos per sensor
+    //cm2 = cm;
     for (int is=0; is<32; ++is) {
       sensor_data_S1[is] -= cm;
       cADC1_[iz][senP_[i]-1][senX_[i]-1][senY_[i]-1][is] = sensor_data_S1[is];
@@ -288,11 +316,62 @@ void ESSplashAnalyzer::analyze(const edm::Event& e, const edm::EventSetup& iSetu
     
     DoCommonMode(sensor_data_CM_S2, &cm);
     hcm_[iz][senP_[i]-1][senX_[i]-1][senY_[i]-1]->Fill(cm);  //Fill CM histos per sensor
+    //cm3 = cm;
     for (int is=0; is<32; ++is) {
       sensor_data_S2[is] -= cm;
       cADC2_[iz][senP_[i]-1][senX_[i]-1][senY_[i]-1][is] = sensor_data_S2[is];
     }
     
+  }
+
+  // ES RecHits
+  Handle<ESRecHitCollection> ESRecHit;
+  if ( e.getByLabel(rechitlabel_, ESRecHit) ) {
+
+    for (ESRecHitCollection::const_iterator hitItr = ESRecHit->begin(); hitItr != ESRecHit->end(); ++hitItr) {
+
+      ESDetId rhid = ESDetId(hitItr->id());
+       
+      zside = rhid.zside();
+      plane = rhid.plane();
+      ix    = rhid.six();
+      iy    = rhid.siy();
+      strip = rhid.strip();
+       
+      iz = (zside==1) ? 0:1;
+      RH_[iz][plane-1][ix-1][iy-1][strip-1] = hitItr->energy();
+       
+    }
+  } 
+
+  // EE RecHits
+  Handle<EERecHitCollection> EERecHit;
+  if ( e.getByLabel(eerechitlabel_, EERecHit) ) {
+
+    for (EERecHitCollection::const_iterator eehitItr = EERecHit->begin(); eehitItr != EERecHit->end(); ++eehitItr) {
+
+      EEDetId eeid = EEDetId(eehitItr->id());
+       
+      if (eeid.zside() > 0)
+	en_eep += eehitItr->energy();
+      else if (eeid.zside() < 0)
+	en_eem += eehitItr->energy();
+       
+    }
+  } 
+
+  // HE RecHits
+  Handle<HBHERecHitCollection> HBHERecHit;
+  if ( e.getByLabel(herechitlabel_, HBHERecHit) ) {
+    HBHERecHitCollection::const_iterator irec;
+    for (irec = HBHERecHit->begin(); irec != HBHERecHit->end(); ++irec) {
+      
+      if (irec->id().ieta() > 0) 
+	en_hep += irec->energy();
+      else if (irec->id().ieta() < 0) 
+	en_hem += irec->energy();
+
+    }
   }
   
   if (dumpTree_) tree_->Fill();
