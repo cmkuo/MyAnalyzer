@@ -10,5 +10,14 @@ run xFitShape in test/splash/ana to extract timing
 https://github.com/cmkuo/MyAnalyzer/tree/master/ESAnalyzer/test/splash/ana
 draw the event display using xEventDisplay.C
 
+To analyze data integrity:
+
+the analyzer is ESAnalyzer/src/ESDIAnalyzer.cc
+the py file is ESAnalyzer/test/check_DataIntegrity.py 
+
+To analyze cosmic or collision data:
+
+the analyzer is ESAnalyzer/src/CollisionAnalyzer.cc 
+the py file is ESAnalyzer/test/commissioning_2015.py for FEVT data and ESAnalyzer/test/commissioning_raw_2015.py for raw data
 
 
