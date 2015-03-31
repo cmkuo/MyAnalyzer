@@ -71,28 +71,6 @@ ESDIAnalyzer::ESDIAnalyzer(const edm::ParameterSet& ps) {
   
   digilabel_    = ps.getParameter<InputTag>("DigiLabel");
 
-  for (int i=0; i<56; ++i) {
-    ESFed_[i] = 0;  
-    for (int j=0; j<36; ++j) 
-      for (int k=0; k<16; ++k)
-	FiberStatus_[i][j][k] = 0;
-
-    for (int j=0; j<6; ++j) 
-      DCCErr_[i][j] = 0;
-    
-    for (int j=0; j<3; ++j) {
-      OptoRX_[i][j] = 0;
-      OptoBC_[i][j] = 0;
-    }
-  }
-
-  for (int i=0; i<1550; ++i) {
-    kBC_[i] = 0;
-    kEC_[i] = 0;
-    for (int j=0; j<16; ++j) kFlag1_[i][j] = 0;
-    for (int j=0; j<16; ++j) kFlag2_[i][j] = 0;
-  }
-
   eCount_ = 0;
   firstDAC_ = -1;
   nDAC_ = 0;
@@ -120,6 +98,28 @@ ESDIAnalyzer::~ESDIAnalyzer() {
 }
 
 void ESDIAnalyzer::analyze(const edm::Event& e, const edm::EventSetup& iSetup) {
+
+  for (int i=0; i<56; ++i) {
+    ESFed_[i] = 0;  
+    for (int j=0; j<36; ++j) 
+      for (int k=0; k<16; ++k)
+	FiberStatus_[i][j][k] = 0;
+
+    for (int j=0; j<6; ++j) 
+      DCCErr_[i][j] = 0;
+    
+    for (int j=0; j<3; ++j) {
+      OptoRX_[i][j] = 0;
+      OptoBC_[i][j] = 0;
+    }
+  }
+
+  for (int i=0; i<1550; ++i) {
+    kBC_[i] = 0;
+    kEC_[i] = 0;
+    for (int j=0; j<16; ++j) kFlag1_[i][j] = 0;
+    for (int j=0; j<16; ++j) kFlag2_[i][j] = 0;
+  }
 
   run   = e.id().run();
   event = e.id().event();
