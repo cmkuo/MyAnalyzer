@@ -151,7 +151,7 @@ const int  lsES[54] = { // line style
    }
 }
 
-void xEventDisplay(Int_t runId=120012) {
+void xEventDisplay(Int_t runId=239754) {
 
   //Reset ROOT and connect tree file
   gROOT->Reset();
@@ -166,8 +166,7 @@ void xEventDisplay(Int_t runId=120012) {
   gStyle->SetPadBottomMargin(0.18);
  
   Char_t fname[200];
-  //sprintf(fname, "/data3/ncuhep/splash/ana/splash_%08d.root", runId);
-  sprintf(fname, "../trees/tree_BeamSplash_1257641879.root");
+  sprintf(fname, "beamsplash_%08d.root", runId);
   TFile *f = new TFile(fname);
   TTree *EventTree = (TTree*) f->Get("EventTree");
   
@@ -224,7 +223,8 @@ void xEventDisplay(Int_t runId=120012) {
     nbytes += EventTree->GetEntry(i);
 
     cout<<"=== "<<run<<" === "<<event<<endl;
-    //if (event != 453) continue;
+    //if (event != 128) continue;
+    Int_t evId = event;
     /*
     for (int j=0; j<2; ++j) 
       for (int k=0; k<2; ++k) {
@@ -334,16 +334,25 @@ void xEventDisplay(Int_t runId=120012) {
     drawBorders( 4, 0.5, 0.5 );
     c8->Update();   
 
-    //c1->Print("espf_en.eps");
-    //c2->Print("espr_en.eps");
-    //c3->Print("esmf_en.eps");
-    //c4->Print("esmr_en.eps");
-    //c5->Print("espf_nmu.png");
-    //c6->Print("espr_nmu.png");
-    //c7->Print("esmf_nmu.png");
-    //c8->Print("esmr_nmu.png");
+    Char_t cname[250];
+    sprintf(cname, "espf_en_run%d_event%d.png", runId, evId);
+    c1->Print(cname);
+    sprintf(cname, "espr_en_run%d_event%d.png", runId, evId);
+    c2->Print(cname);
+    sprintf(cname, "esmf_en_run%d_event%d.png", runId, evId);
+    c3->Print(cname);
+    sprintf(cname, "esmr_en_run%d_event%d.png", runId, evId);
+    c4->Print(cname);
+    sprintf(cname, "espf_nmu_run%d_event%d.png", runId, evId);
+    c5->Print(cname);
+    sprintf(cname, "espr_nmu_run%d_event%d.png", runId, evId);
+    c6->Print(cname);
+    sprintf(cname, "esmf_nmu_run%d_event%d.png", runId, evId);
+    c7->Print(cname);
+    sprintf(cname, "esmr_nmu_run%d_event%d.png", runId, evId);
+    c8->Print(cname);
 
-    //cin.get();
+    cin.get();
   }
 
 }

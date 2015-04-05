@@ -19,8 +19,8 @@ void xFitShape(Int_t runId=119878, Int_t z=1, Int_t p=0, Int_t x=23, Int_t y=34)
   gStyle->SetOptFit(kFALSE);
   gStyle->SetOptTitle(kTRUE);  
   Char_t fname[200];
-  //sprintf(fname, "splash_%08d.root", runId);
-  sprintf(fname, "../trees/tree_BeamSplash_1257640341.root");
+  sprintf(fname, "beamsplash_%08d.root", runId);
+  //sprintf(fname, "../trees/tree_BeamSplash_1257640341.root");
   TFile *f = new TFile(fname);
   TTree *EventTree = (TTree*) f->Get("EventTree");
   
@@ -64,7 +64,7 @@ void xFitShape(Int_t runId=119878, Int_t z=1, Int_t p=0, Int_t x=23, Int_t y=34)
     nbytes += EventTree->GetEntry(i);
     
     cout<<"=== "<<run<<" === "<<event<<endl;
-    if (event != 287) continue;
+    //if (event != 287) continue;
     Int_t good[32];
     for (int j=0; j<32; ++j) {
 

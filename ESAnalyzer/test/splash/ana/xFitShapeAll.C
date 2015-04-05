@@ -24,7 +24,7 @@ Double_t fitf(Double_t *x, Double_t *par) {
   return v;
 }
 
-void xFitShapeAll(Int_t runId=120012) {
+void xFitShapeAll(Int_t runId=239754) {
   
   //Reset ROOT and connect tree file
   gROOT->Reset();
@@ -38,7 +38,7 @@ void xFitShapeAll(Int_t runId=120012) {
   gStyle->SetPadTopMargin(0.15);
   gStyle->SetPadBottomMargin(0.15);
   Char_t fname[200];
-  sprintf(fname, "/data3/ncuhep/splash/ana/splash_%08d.root", runId);
+  sprintf(fname, "beamsplash_%08d.root", runId);
   TFile *f = new TFile(fname);
   TTree *EventTree = (TTree*) f->Get("EventTree");
   
@@ -69,7 +69,11 @@ void xFitShapeAll(Int_t runId=120012) {
   func->SetLineWidth(2);
   
   TH1F *hMIP = new TH1F("hMIP", "hMIP", 200, 0, 1000);  
-  TH1F *hT0  = new TH1F("hT0", "hT0", 100, -50, 50);
+
+  TH1F *hT0espf = new TH1F("hT0espf", "hT0 ES+ F", 100, -50, 50);
+  TH1F *hT0espr = new TH1F("hT0espr", "hT0 ES+ R", 100, -50, 50);
+  TH1F *hT0esmf = new TH1F("hT0esmf", "hT0 ES- F", 100, -50, 50);
+  TH1F *hT0esmr = new TH1F("hT0esmr", "hT0 ES- R", 100, -50, 50);
   
   TH2F *hespf = new TH2F("hespf", "ES+ F", 40, 0.5, 40.5, 40, 0.5, 40.5);
   TH2F *hespr = new TH2F("hespr", "ES+ R", 40, 0.5, 40.5, 40, 0.5, 40.5);
@@ -78,8 +82,9 @@ void xFitShapeAll(Int_t runId=120012) {
 
   TCanvas *c1 = new TCanvas("c1", "c1", 800, 800);
   c1->Divide(2,2);
-  //TCanvas *c2 = new TCanvas("c2", "c2", 900, 600);
-  //TCanvas *c3 = new TCanvas("c3", "c3", 900, 600);
+  TCanvas *c2 = new TCanvas("c2", "c2", 900, 600);
+  TCanvas *c3 = new TCanvas("c3", "c3", 900, 600);
+  c3->Divide(2,2);
 
   Int_t evId = -1;
   
@@ -87,8 +92,8 @@ void xFitShapeAll(Int_t runId=120012) {
   for (Long64_t i=0; i<nentries;i++) {
     nbytes += EventTree->GetEntry(i);
     
+    if (run==239754 && event!=162) continue;
     cout<<"=== "<<run<<" === "<<event<<endl;
-    if (run==120012 && event!=18) continue;
     evId = event;
     Int_t t0 = -5;
     tx[0] = t0;
@@ -125,7 +130,11 @@ void xFitShapeAll(Int_t runId=120012) {
 	      func->GetParameters(para);
 
 	      hMIP->Fill(para[0]*81.08/55);
-	      hT0->Fill(para[1]);	      	      
+
+	      if (z==0 && p==0) hT0espf->Fill(para[1]);
+	      if (z==0 && p==1) hT0espr->Fill(para[1]);
+	      if (z==1 && p==0) hT0esmf->Fill(para[1]);
+	      if (z==1 && p==1) hT0esmr->Fill(para[1]);
 
 	      navt++;
 	      avt += para[1];
@@ -167,7 +176,7 @@ void xFitShapeAll(Int_t runId=120012) {
     //cin.get();
         
   }
-  /*
+
   Char_t tname[200];
   sprintf(tname, "Run %d Event %d", runId, evId);  
   c2->cd();
@@ -176,49 +185,74 @@ void xFitShapeAll(Int_t runId=120012) {
   hMIP->SetLineWidth(3);
   hMIP->SetLineColor(4);
   hMIP->Draw();
-  c3->cd();
-  hT0->SetTitle(tname);
-  hT0->GetXaxis()->SetTitle("T0 (ns)");
-  hT0->SetLineWidth(3);
-  hT0->SetLineColor(4);
-  hT0->Draw();
+
+  c3->cd(1);
+  sprintf(tname, "Run %d Event %d ES+ F", runId, evId);  
+  hT0espf->SetTitle(tname);
+  hT0espf->GetXaxis()->SetTitle("T0 (ns)");
+  hT0espf->SetLineWidth(3);
+  hT0espf->SetLineColor(4);
+  hT0espf->Draw();
+  c3->cd(2);
+  sprintf(tname, "Run %d Event %d ES- F", runId, evId);  
+  hT0esmf->SetTitle(tname);
+  hT0esmf->GetXaxis()->SetTitle("T0 (ns)");
+  hT0esmf->SetLineWidth(3);
+  hT0esmf->SetLineColor(4);
+  hT0esmf->Draw();
+  c3->cd(3);
+  sprintf(tname, "Run %d Event %d ES+ R", runId, evId);  
+  hT0espr->SetTitle(tname);
+  hT0espr->GetXaxis()->SetTitle("T0 (ns)");
+  hT0espr->SetLineWidth(3);
+  hT0espr->SetLineColor(4);
+  hT0espr->Draw();
+  c3->cd(4);
+  sprintf(tname, "Run %d Event %d ES- R", runId, evId);  
+  hT0esmr->SetTitle(tname);
+  hT0esmr->GetXaxis()->SetTitle("T0 (ns)");
+  hT0esmr->SetLineWidth(3);
+  hT0esmr->SetLineColor(4);
+  hT0esmr->Draw();
   //c3->Update();
-  */
+
+  Float_t tMax = 20;
+  Float_t tMin = -40;
   c1->cd(1);
-  hespf->SetMaximum(25);
-  hespf->SetMinimum(-10);
+  hespf->SetMaximum(tMax);
+  hespf->SetMinimum(tMin);
   hespf->GetXaxis()->SetTitle("Si X");
   hespf->GetYaxis()->SetTitle("Si Y");
   hespf->GetZaxis()->SetTitle("TO (ns)");
   hespf->Draw("colz");
   c1->cd(2);
-  hesmf->SetMaximum(25);
-  hesmf->SetMinimum(-10);
+  hesmf->SetMaximum(tMax);
+  hesmf->SetMinimum(tMin);
   hesmf->GetXaxis()->SetTitle("Si X");
   hesmf->GetYaxis()->SetTitle("Si Y");
   hesmf->GetZaxis()->SetTitle("TO (ns)");
   hesmf->Draw("colz");
   c1->cd(3);
-  hespr->SetMaximum(25);
-  hespr->SetMinimum(-10);
+  hespr->SetMaximum(tMax);
+  hespr->SetMinimum(tMin);
   hespr->GetXaxis()->SetTitle("Si X");
   hespr->GetYaxis()->SetTitle("Si Y");
   hespr->GetZaxis()->SetTitle("TO (ns)");
   hespr->Draw("colz");
   c1->cd(4);
-  hesmr->SetMaximum(25);
-  hesmr->SetMinimum(-10);
+  hesmr->SetMaximum(tMax);
+  hesmr->SetMinimum(tMin);
   hesmr->GetXaxis()->SetTitle("Si X");
   hesmr->GetYaxis()->SetTitle("Si Y");
   hesmr->GetZaxis()->SetTitle("TO (ns)");
   hesmr->Draw("colz");
 
-  c1->Print("es_timing.png");
-  /*
+  sprintf(tname, "es_timing_%d_%d.png", runId, evId);  
+  c1->Print(tname);
   sprintf(tname, "energy_spectrum_%d_%d.png", runId, evId);  
   c2->Print(tname);
   sprintf(tname, "t0_%d_%d.png", runId, evId);  
   c3->Print(tname);
-  */
+
 }
 
