@@ -7,8 +7,8 @@ process = cms.Process("Demo")
 options = VarParsing.VarParsing ('standard')
 
 # setup any defaults you want
-options.files = 'file:/data4/cmkuo/Comissioning2015/run238546_ls0001_streamA_StorageManager.dat'
-options.output = 'test.root'
+options.files = '/store/caf/user/ccecal/TPG/splashes_239754_5events_April2015_MinimumBias.root'
+options.output = 'beamsplash_00239754.root'
 options.parseArguments()
 
 process.load("FWCore.MessageLogger.MessageLogger_cfi")
@@ -17,14 +17,16 @@ process.load("FWCore.MessageLogger.MessageLogger_cfi")
 process.load("DQM.Integration.test.FrontierCondition_GT_Offline_cfi") 
 
 process.maxEvents = cms.untracked.PSet(
-        input = cms.untracked.int32(5)
+        input = cms.untracked.int32(-1)
         )
 
-process.source = cms.Source('NewEventStreamFileReader',
-#process.source = cms.Source("PoolSource",
+#process.source = cms.Source('NewEventStreamFileReader',
+process.source = cms.Source("PoolSource",
                             fileNames = cms.untracked.vstring(
     options.files
-    #'file:/data3/ncuhep/splash/digi/BeamSplash_1257738510.root'
+        #'/store/express/Commissioning2015/ExpressCosmics/FEVT/Express-v1/000/239/754/00000/30C3CEC6-6EDB-E411-A2E3-02163E0136CE.root',
+        #'/store/express/Commissioning2015/ExpressCosmics/FEVT/Express-v1/000/239/754/00000/4010520D-70DB-E411-9C96-02163E01367A.root',
+        #'/store/express/Commissioning2015/ExpressCosmics/FEVT/Express-v1/000/239/754/00000/E02FF3C0-6FDB-E411-9B8B-02163E0136CE.root'
     )
                             )
 
