@@ -6,7 +6,7 @@ To analyze splash events:
 
 test/splash/test.py can be used for minidaq data.
 
-run xFitShape in test/splash/ana to extract timing
+run xFitShapeAll in test/splash/ana to extract timing
 https://github.com/cmkuo/MyAnalyzer/tree/master/ESAnalyzer/test/splash/ana
 draw the event display using xEventDisplay.C
 
