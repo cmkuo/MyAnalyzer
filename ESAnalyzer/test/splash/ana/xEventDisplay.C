@@ -151,7 +151,7 @@ const int  lsES[54] = { // line style
    }
 }
 
-void xEventDisplay(Int_t runId=239754) {
+void xEventDisplay(Int_t runId=239821) {
 
   //Reset ROOT and connect tree file
   gROOT->Reset();
@@ -172,6 +172,7 @@ void xEventDisplay(Int_t runId=239754) {
   
   //Declaration of leaves types
   Int_t           run;
+  Int_t           lumis;
   Int_t           event;
   Int_t           ADC0[2][2][40][40][32];
   Int_t           ADC1[2][2][40][40][32];
@@ -183,6 +184,7 @@ void xEventDisplay(Int_t runId=239754) {
   
   // Set branch addresses.
   EventTree->SetBranchAddress("run",&run);
+  EventTree->SetBranchAddress("lumis",&lumis);
   EventTree->SetBranchAddress("event",&event);
   EventTree->SetBranchAddress("ADC0",ADC0);
   EventTree->SetBranchAddress("ADC1",ADC1);
@@ -210,6 +212,8 @@ void xEventDisplay(Int_t runId=239754) {
   Char_t hname[200];
   TH2F *h2[2][2];
   TH2F *hmu[2][2];
+  Float_t energyDensity[2][2];
+  Float_t nStrips[2][2];
   for (int j=0; j<2; ++j)
     for (int k=0; k<2; ++k) {
       sprintf(hname, "h2_z%d_p%d", j, k);
@@ -222,16 +226,17 @@ void xEventDisplay(Int_t runId=239754) {
   for (Long64_t i=0; i<nentries;i++) {
     nbytes += EventTree->GetEntry(i);
 
-    cout<<"=== "<<run<<" === "<<event<<endl;
     //if (event != 128) continue;
     Int_t evId = event;
-    /*
+
     for (int j=0; j<2; ++j) 
       for (int k=0; k<2; ++k) {
 	h2[j][k]->Reset();
 	hmu[j][k]->Reset();
+	energyDensity[j][k] = 0.;
+	nStrips[j][k] = 0.;
       }
-    */
+
     for (int z=0; z<2; ++z) 
       for (int p=0; p<2; ++p)
 	for (int x=0; x<40; ++x) 
@@ -261,6 +266,8 @@ void xEventDisplay(Int_t runId=239754) {
 		if (para[0] > 0) {
 		  h2[z][p]->Fill(x+1, y+1, para[0]);
 		  hmu[z][p]->Fill(x+1, y+1, para[0]/55.);
+		  energyDensity[z][p] += para[0]/55.;
+		  nStrips[z][p]++;
 		} else {
 		  h2[z][p]->Fill(x+1, y+1, 0);
 		  hmu[z][p]->Fill(x+1, y+1, 0);
@@ -296,8 +303,10 @@ void xEventDisplay(Int_t runId=239754) {
     //hmu[0][1]->SetMaximum(350);
     //hmu[1][0]->SetMaximum(350);
     //hmu[1][1]->SetMaximum(350);
+    Char_t tname[250];
     c5->cd();
-    hmu[0][0]->SetTitle("ES+ Front ");
+    sprintf(tname, "Run %d LS %d Ev %d ES+F", run, lumis, event);
+    hmu[0][0]->SetTitle(tname);
     hmu[0][0]->GetXaxis()->SetTitle("Si X");
     hmu[0][0]->GetYaxis()->SetTitle("Si Y");
     hmu[0][0]->GetZaxis()->SetTitle("Number of MIPs");
@@ -306,7 +315,8 @@ void xEventDisplay(Int_t runId=239754) {
     drawBorders( 1, 0.5, 0.5 );
     c5->Update();
     c6->cd();
-    hmu[0][1]->SetTitle("ES+ Rear");
+    sprintf(tname, "Run %d LS %d Ev %d ES+R", run, lumis, event);
+    hmu[0][1]->SetTitle(tname);
     hmu[0][1]->GetXaxis()->SetTitle("Si X");
     hmu[0][1]->GetYaxis()->SetTitle("Si Y");
     hmu[0][1]->GetZaxis()->SetTitle("Number of MIPs");
@@ -315,7 +325,8 @@ void xEventDisplay(Int_t runId=239754) {
     drawBorders( 3, 0.5, 0.5 );
     c6->Update();
     c7->cd();
-    hmu[1][0]->SetTitle("ES- Front");
+    sprintf(tname, "Run %d LS %d Ev %d ES-F", run, lumis, event);
+    hmu[1][0]->SetTitle(tname);
     hmu[1][0]->GetXaxis()->SetTitle("Si X");
     hmu[1][0]->GetYaxis()->SetTitle("Si Y");
     hmu[1][0]->GetZaxis()->SetTitle("Number of MIPs");
@@ -324,7 +335,8 @@ void xEventDisplay(Int_t runId=239754) {
     drawBorders( 2, 0.5, 0.5 );
     c7->Update();
     c8->cd();
-    hmu[1][1]->SetTitle("ES- Rear");
+    sprintf(tname, "Run %d LS %d Ev %d ES-R", run, lumis, event);
+    hmu[1][1]->SetTitle(tname);
     //TGaxis::SetMaxDigits(2);
     hmu[1][1]->GetXaxis()->SetTitle("Si X");
     hmu[1][1]->GetYaxis()->SetTitle("Si Y");
@@ -335,24 +347,30 @@ void xEventDisplay(Int_t runId=239754) {
     c8->Update();   
 
     Char_t cname[250];
-    sprintf(cname, "espf_en_run%d_event%d.png", runId, evId);
-    c1->Print(cname);
-    sprintf(cname, "espr_en_run%d_event%d.png", runId, evId);
-    c2->Print(cname);
-    sprintf(cname, "esmf_en_run%d_event%d.png", runId, evId);
-    c3->Print(cname);
-    sprintf(cname, "esmr_en_run%d_event%d.png", runId, evId);
-    c4->Print(cname);
-    sprintf(cname, "espf_nmu_run%d_event%d.png", runId, evId);
+    sprintf(cname, "espf_en_run%d_ls%d_event%d.png", runId, lumis, evId);
+    //c1->Print(cname);
+    sprintf(cname, "espr_en_run%d_ls%d_event%d.png", runId, lumis, evId);
+    //c2->Print(cname);
+    sprintf(cname, "esmf_en_run%d_ls%d_event%d.png", runId, lumis, evId);
+    //c3->Print(cname);
+    sprintf(cname, "esmr_en_run%d_ls%d_event%d.png", runId, lumis, evId);
+    //c4->Print(cname);
+    sprintf(cname, "espf_nmu_run%d_ls%d_event%d.png", runId, lumis, evId);
     c5->Print(cname);
-    sprintf(cname, "espr_nmu_run%d_event%d.png", runId, evId);
+    sprintf(cname, "espr_nmu_run%d_ls%d_event%d.png", runId, lumis, evId);
     c6->Print(cname);
-    sprintf(cname, "esmf_nmu_run%d_event%d.png", runId, evId);
+    sprintf(cname, "esmf_nmu_run%d_ls%d_event%d.png", runId, lumis, evId);
     c7->Print(cname);
-    sprintf(cname, "esmr_nmu_run%d_event%d.png", runId, evId);
+    sprintf(cname, "esmr_nmu_run%d_ls%d_event%d.png", runId, lumis, evId);
     c8->Print(cname);
 
-    cin.get();
+    cout<<"===== Energy Density ===== run : "<<runId<<" LS : "<<lumis<<" event : "<<evId<<endl;    
+    cout<<"ES+F : "<<energyDensity[0][0]/(nStrips[0][0]*6.1*6.1/32)<<" # of Strips : "<<nStrips[0][0]<<endl;
+    cout<<"ES+R : "<<energyDensity[0][1]/(nStrips[0][1]*6.1*6.1/32)<<" # of Strips : "<<nStrips[0][1]<<endl;
+    cout<<"ES-F : "<<energyDensity[1][0]/(nStrips[1][0]*6.1*6.1/32)<<" # of Strips : "<<nStrips[1][0]<<endl;
+    cout<<"ES-R : "<<energyDensity[1][1]/(nStrips[1][1]*6.1*6.1/32)<<" # of Strips : "<<nStrips[1][1]<<endl;
+
+    //cin.get();
   }
 
 }
