@@ -57,8 +57,8 @@ class ESSplashAnalyzer : public edm::EDAnalyzer {
   TTree *tree_;
   TH1F *hcm_[2][2][40][40];
 
-  int nLines_, runNum_, evNum_, eCount_, runtype_, seqtype_, dac_, gain_, precision_;
-  int firstDAC_, nDAC_, isPed_, vDAC_[5], side_, layer_, bx_, orbit_;
+  int nLines_, runNum_, lumis_, evNum_, eCount_, runtype_, seqtype_, dac_, gain_, precision_;
+  int firstDAC_, nDAC_, isPed_, vDAC_[5], side_, layer_, bx_, orbit_, NumberOfESHitsThreshold_;
  
   int senZ_[4288], senP_[4288], senX_[4288], senY_[4288], fed_[4288];
   int ADC0_[2][2][40][40][32]; 
@@ -86,6 +86,7 @@ ESSplashAnalyzer::ESSplashAnalyzer(const edm::ParameterSet& ps) {
   herechitlabel_  = ps.getParameter<InputTag>("HERecHitLabel");
   lookup_         = ps.getUntrackedParameter<FileInPath>("LookupTable");
   dumpTree_       = ps.getUntrackedParameter<bool>("DumpTree", false);
+  NumberOfESHitsThreshold_ = ps.getUntrackedParameter<int>("NumberOfESHitsThreshold", 0);
 
   // read in hot channel map
   ifstream hotFile;
@@ -142,6 +143,7 @@ ESSplashAnalyzer::ESSplashAnalyzer(const edm::ParameterSet& ps) {
   if (dumpTree_) {
     tree_ = new TTree("EventTree", "Event data");
     tree_->Branch("run", &runNum_, "run/I");
+    tree_->Branch("lumis",  &lumis_, "lumis/I");
     tree_->Branch("event", &evNum_, "event/I");
     tree_->Branch("orbit", &orbit_, "orbit/I");
     tree_->Branch("bx", &bx_, "bx/I");
@@ -181,9 +183,10 @@ ESSplashAnalyzer::~ESSplashAnalyzer() {
 void ESSplashAnalyzer::analyze(const edm::Event& e, const edm::EventSetup& iSetup) {
 
   runNum_ = e.id().run();
-  evNum_ = e.id().event();
-  orbit_ = e.orbitNumber();
-  bx_ = e.bunchCrossing();
+  lumis_  = e.luminosityBlock();
+  evNum_  = e.id().event();
+  orbit_  = e.orbitNumber();
+  bx_     = e.bunchCrossing();
   eCount_++;
   /*
   Handle<ESRawDataCollection> dccs;
@@ -206,6 +209,8 @@ void ESSplashAnalyzer::analyze(const edm::Event& e, const edm::EventSetup& iSetu
   //orbit_ = dcc.getOrbitNumber();
   //}
   
+  Int_t nESHits = 0;
+
   // Digis
   //Need for storing original data
   int data_S0[2][2][40][40][32];
@@ -264,7 +269,7 @@ void ESSplashAnalyzer::analyze(const edm::Event& e, const edm::EventSetup& iSetu
     data_S2[iz][plane-1][ix-1][iy-1][strip-1] = dataframe.sample(2).adc();    //storing S2 data
 
     //cout<<iz<<" "<<plane<<" "<<ix<<" "<<iy<<" "<<strip<<" "<<dataframe.sample(0).adc()<<" "<<dataframe.sample(1).adc()<<" "<<dataframe.sample(2).adc()<<endl;
-
+    nESHits++;
   }
 
   double sensor_data_CM_S0[32];
@@ -374,7 +379,8 @@ void ESSplashAnalyzer::analyze(const edm::Event& e, const edm::EventSetup& iSetu
     }
   }
   
-  if (dumpTree_) tree_->Fill();
+  if (dumpTree_ && nESHits > NumberOfESHitsThreshold_) tree_->Fill();
+
 }
 
 void ESSplashAnalyzer::DoCommonMode(double det_data[], double *cm) {

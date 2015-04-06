@@ -7,8 +7,9 @@ process = cms.Process("Demo")
 options = VarParsing.VarParsing ('standard')
 
 # setup any defaults you want
-options.files = '/store/caf/user/ccecal/TPG/splashes_239754_5events_April2015_MinimumBias.root'
-options.output = 'beamsplash_00239754.root'
+#options.files = '/store/caf/user/ccecal/TPG/splashes_239754_5events_April2015_MinimumBias.root'
+options.files = '/store/caf/user/ccecal/TPG/SplashLikeEvents_2015_run239821.root'
+options.output = 'beamsplash_00239821.root'
 options.parseArguments()
 
 process.load("FWCore.MessageLogger.MessageLogger_cfi")
@@ -24,6 +25,7 @@ process.maxEvents = cms.untracked.PSet(
 process.source = cms.Source("PoolSource",
                             fileNames = cms.untracked.vstring(
     options.files
+        #'/store/express/Commissioning2015/ExpressCosmics/FEVT/Express-v1/000/239/821/00000/C8004CC8-64DC-E411-8DCB-02163E0133B2.root'
         #'/store/express/Commissioning2015/ExpressCosmics/FEVT/Express-v1/000/239/754/00000/30C3CEC6-6EDB-E411-A2E3-02163E0136CE.root',
         #'/store/express/Commissioning2015/ExpressCosmics/FEVT/Express-v1/000/239/754/00000/4010520D-70DB-E411-9C96-02163E01367A.root',
         #'/store/express/Commissioning2015/ExpressCosmics/FEVT/Express-v1/000/239/754/00000/E02FF3C0-6FDB-E411-9B8B-02163E0136CE.root'
@@ -45,7 +47,8 @@ process.splash = cms.EDAnalyzer("ESSplashAnalyzer",
                                 OutputFile = cms.untracked.string(options.output),
                                 HotChannelFile = cms.untracked.string("hotChannel.dat"),
                                 LookupTable = cms.untracked.FileInPath("EventFilter/ESDigiToRaw/data/ES_lookup_table.dat"),
-                                DumpTree = cms.untracked.bool(True)
+                                DumpTree = cms.untracked.bool(True),
+                                NumberOfESHitsThreshold = cms.untracked.int32(0)
                                 )
 
 #process.patOutputModule = cms.OutputModule("PoolOutputModule",
