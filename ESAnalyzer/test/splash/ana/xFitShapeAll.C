@@ -150,7 +150,7 @@ void drawBorders( int plane, float sx, float sy ) {
   }
 }
 
-void xFitShapeAll(Int_t runId=239821) {
+void xFitShapeAll(Int_t runId=239895) {
   
   //Reset ROOT and connect tree file
   gROOT->Reset();
@@ -172,6 +172,7 @@ void xFitShapeAll(Int_t runId=239821) {
   Int_t           run;
   Int_t           lumis;
   Int_t           event;
+  Int_t           bx;
   Int_t           ADC0[2][2][40][40][32];
   Int_t           ADC1[2][2][40][40][32];
   Int_t           ADC2[2][2][40][40][32];
@@ -183,6 +184,7 @@ void xFitShapeAll(Int_t runId=239821) {
   EventTree->SetBranchAddress("run",&run);
   EventTree->SetBranchAddress("lumis",&lumis);
   EventTree->SetBranchAddress("event",&event);
+  EventTree->SetBranchAddress("bx",&bx);
   EventTree->SetBranchAddress("ADC0",ADC0);
   EventTree->SetBranchAddress("ADC1",ADC1);
   EventTree->SetBranchAddress("ADC2",ADC2);
@@ -246,8 +248,9 @@ void xFitShapeAll(Int_t runId=239821) {
     hesmr->Reset();
 
     nAnalyzedEvents++;
-    if (nAnalyzedEvents < 73) continue;
-    //if (run==239821 && event!=28658) continue;
+    if (nAnalyzedEvents < 18) continue;
+    //if (run==239895 && event!=46482) continue;
+    //if (bx != 207) continue;
     evId = event;
     Int_t t0 = -5;
     tx[0] = t0;
@@ -308,7 +311,7 @@ void xFitShapeAll(Int_t runId=239821) {
 	      cout<<counts[j][0]<<" "<<counts[j][1]<<" "<<counts[j][2]<<endl;
 	      cin.get();
 	      */
-	      
+	      delete gr;
 	    }
 	    //cout<<x+1<<" "<<y+1<<" "<<avt<<" "<<navt<<endl;
 	    if (navt != 0) { 
@@ -324,11 +327,11 @@ void xFitShapeAll(Int_t runId=239821) {
 	    }	   
 	  }
 
-    cout<<"=== "<<run<<" === "<<lumis<<" === "<<event<<endl;
+    cout<<"=== "<<run<<" === "<<lumis<<" === "<<event<<" === bx : "<<bx<<endl;
     cout<<"Done"<<endl;
 
     Char_t tname[200];
-    sprintf(tname, "Run %d LS %d Event %d", runId, lumis, evId);  
+    sprintf(tname, "Run %d LS %d Ev %d BX %d", runId, lumis, evId, bx);  
     c2->cd();
     hMIP->SetTitle(tname);
     hMIP->GetXaxis()->SetTitle("Deposited energy per strip (KeV)");
@@ -338,28 +341,28 @@ void xFitShapeAll(Int_t runId=239821) {
     c2->Update();
 
     c3->cd(1);
-    sprintf(tname, "Run %d LS %d Ev %d ES+ F", runId, lumis, evId);  
+    sprintf(tname, "Run %d LS %d Ev %d BX %d ES+ F", runId, lumis, evId, bx);  
     hT0espf->SetTitle(tname);
     hT0espf->GetXaxis()->SetTitle("T0 (ns)");
     hT0espf->SetLineWidth(3);
     hT0espf->SetLineColor(4);
     hT0espf->Draw();
     c3->cd(2);
-    sprintf(tname, "Run %d LS %d Ev %d ES- F", runId, lumis, evId);  
+    sprintf(tname, "Run %d LS %d Ev %d BX %d ES- F", runId, lumis, evId, bx);  
     hT0esmf->SetTitle(tname);
     hT0esmf->GetXaxis()->SetTitle("T0 (ns)");
     hT0esmf->SetLineWidth(3);
     hT0esmf->SetLineColor(4);
     hT0esmf->Draw();
     c3->cd(3);
-    sprintf(tname, "Run %d LS %d Ev %d ES+ R", runId, lumis, evId);  
+    sprintf(tname, "Run %d LS %d Ev %d BX %d ES+ R", runId, lumis, evId, bx);  
     hT0espr->SetTitle(tname);
     hT0espr->GetXaxis()->SetTitle("T0 (ns)");
     hT0espr->SetLineWidth(3);
     hT0espr->SetLineColor(4);
     hT0espr->Draw();
     c3->cd(4);
-    sprintf(tname, "Run %d LS %d Ev %d ES- R", runId, lumis, evId);  
+    sprintf(tname, "Run %d LS %d Ev %d BX %d ES- R", runId, lumis, evId, bx);  
     hT0esmr->SetTitle(tname);
     hT0esmr->GetXaxis()->SetTitle("T0 (ns)");
     hT0esmr->SetLineWidth(3);
@@ -368,28 +371,28 @@ void xFitShapeAll(Int_t runId=239821) {
     c3->Update();
     
     c4->cd(1);
-    sprintf(tname, "Run %d LS %d Ev %d ES+ F", runId, lumis, evId);  
+    sprintf(tname, "Run %d LS %d Ev %d BX %d ES+ F", runId, lumis, evId, bx);  
     hADC1espf->SetTitle(tname);
     hADC1espf->GetXaxis()->SetTitle("ADC 1");
     hADC1espf->SetLineWidth(3);
     hADC1espf->SetLineColor(4);
     hADC1espf->Draw();
     c4->cd(2);
-    sprintf(tname, "Run %d LS %d Ev %d ES- F", runId, lumis, evId);  
+    sprintf(tname, "Run %d LS %d Ev %d BX %d ES- F", runId, lumis, evId, bx);  
     hADC1esmf->SetTitle(tname);
     hADC1esmf->GetXaxis()->SetTitle("ADC 1");
     hADC1esmf->SetLineWidth(3);
     hADC1esmf->SetLineColor(4);
     hADC1esmf->Draw();
     c4->cd(3);
-    sprintf(tname, "Run %d LS %d Ev %d ES+ R", runId, lumis, evId);  
+    sprintf(tname, "Run %d LS %d Ev %d BX %d ES+ R", runId, lumis, evId, bx);  
     hADC1espr->SetTitle(tname);
     hADC1espr->GetXaxis()->SetTitle("ADC 1");
     hADC1espr->SetLineWidth(3);
     hADC1espr->SetLineColor(4);
     hADC1espr->Draw();
     c4->cd(4);
-    sprintf(tname, "Run %d LS %d Ev %d ES- R", runId, lumis, evId);  
+    sprintf(tname, "Run %d LS %d Ev %d BX %d ES- R", runId, lumis, evId, bx);  
     hADC1esmr->SetTitle(tname);
     hADC1esmr->GetXaxis()->SetTitle("ADC 1");
     hADC1esmr->SetLineWidth(3);
@@ -400,7 +403,7 @@ void xFitShapeAll(Int_t runId=239821) {
     Float_t tMax = 20;
     Float_t tMin = -40;
     c1->cd(1);
-    sprintf(tname, "Run %d LS %d Ev %d ES+ F", runId, lumis, evId);  
+    sprintf(tname, "Run %d LS %d Ev %d BX %d ES+ F", runId, lumis, evId, bx);  
     hespf->SetTitle(tname);
     hespf->SetMaximum(tMax);
     hespf->SetMinimum(tMin);
@@ -410,7 +413,7 @@ void xFitShapeAll(Int_t runId=239821) {
     hespf->Draw("colz");
     drawBorders( 1, 0.5, 0.5 );
     c1->cd(2);
-    sprintf(tname, "Run %d LS %d Ev %d ES- F", runId, lumis, evId);  
+    sprintf(tname, "Run %d LS %d Ev %d BX %d ES- F", runId, lumis, evId, bx);  
     hesmf->SetTitle(tname);
     hesmf->SetMaximum(tMax);
     hesmf->SetMinimum(tMin);
@@ -420,7 +423,7 @@ void xFitShapeAll(Int_t runId=239821) {
     hesmf->Draw("colz");
     drawBorders( 2, 0.5, 0.5 );
     c1->cd(3);
-    sprintf(tname, "Run %d LS %d Ev %d ES+ R", runId, lumis, evId);  
+    sprintf(tname, "Run %d LS %d Ev %d BX %d ES+ R", runId, lumis, evId, bx);  
     hespr->SetTitle(tname);
     hespr->SetMaximum(tMax);
     hespr->SetMinimum(tMin);
@@ -430,7 +433,7 @@ void xFitShapeAll(Int_t runId=239821) {
     hespr->Draw("colz");
     drawBorders( 3, 0.5, 0.5 );
     c1->cd(4);
-    sprintf(tname, "Run %d LS %d Ev %d ES- R", runId, lumis, evId);  
+    sprintf(tname, "Run %d LS %d Ev %d BX %d ES- R", runId, lumis, evId, bx);  
     hesmr->SetTitle(tname);
     hesmr->SetMaximum(tMax);
     hesmr->SetMinimum(tMin);
@@ -441,13 +444,13 @@ void xFitShapeAll(Int_t runId=239821) {
     drawBorders( 4, 0.5, 0.5 );
     c1->Update();    
 
-    sprintf(tname, "es_timing_%d_%d_%d.png", runId, lumis, evId);  
+    sprintf(tname, "es_timing_%d_%d_%d_bx%d.png", runId, lumis, evId, bx);  
     c1->Print(tname);
-    sprintf(tname, "energy_spectrum_%d_%d_%d.png", runId, lumis, evId);  
+    sprintf(tname, "energy_spectrum_%d_%d_%d_bx%d.png", runId, lumis, evId, bx);  
     c2->Print(tname);
-    sprintf(tname, "t0_%d_%d_%d.png", runId, lumis, evId);  
+    sprintf(tname, "t0_%d_%d_%d_bx%d.png", runId, lumis, evId, bx);  
     c3->Print(tname);
-    sprintf(tname, "ADC1_%d_%d_%d.png", runId, lumis, evId);  
+    sprintf(tname, "ADC1_%d_%d_%d_bx%d.png", runId, lumis, evId, bx);  
     c4->Print(tname);
     
     //cin.get();
