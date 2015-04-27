@@ -3,15 +3,8 @@ import FWCore.ParameterSet.VarParsing as VarParsing
 
 process = cms.Process('RECOES')
 
-# setup 'standard'  options
-options = VarParsing.VarParsing ('standard')
-
-# setup any defaults you want
-options.files = "/store/express/Commissioning2015/ExpressCosmics/FEVT/Express-v1/000/237/243/00000/F6447065-10C6-E411-A76B-02163E012ADF.root"
-options.output = 'collision_00237243.root'
-options.parseArguments()
-
 # import of standard configurations
+#process.load("Configuration.StandardSequences.MagneticField_0T_cff")
 process.load("Configuration.StandardSequences.MagneticField_cff")
 process.load("Configuration.StandardSequences.Geometry_cff")
 process.load("Configuration.StandardSequences.GeometryExtended_cff")
@@ -19,6 +12,22 @@ process.load("Geometry.CommonDetUnit.bareGlobalTrackingGeometry_cfi")
 process.load("TrackPropagation.SteppingHelixPropagator.SteppingHelixPropagatorAlong_cfi")
 process.load("TrackPropagation.SteppingHelixPropagator.SteppingHelixPropagatorOpposite_cfi")
 process.load("TrackPropagation.SteppingHelixPropagator.SteppingHelixPropagatorAny_cfi")
+
+process.MessageLogger = cms.Service("MessageLogger",
+    destinations = cms.untracked.vstring('cerr'),
+    categories = cms.untracked.vstring('EcalDQM', 'fileAction'),
+    cerr = cms.untracked.PSet(
+        threshold = cms.untracked.string("WARNING"),
+        noLineBreaks = cms.untracked.bool(True),
+        noTimeStamps = cms.untracked.bool(True),
+        default = cms.untracked.PSet(
+            limit = cms.untracked.int32(-1)
+        ),
+        fileAction = cms.untracked.PSet(
+            limit = cms.untracked.int32(10)
+        )
+    )
+)
 
 process.load("Configuration.StandardSequences.FrontierConditions_GlobalTag_cff")
 process.GlobalTag.globaltag = cms.string('COSM72_DEC_V1::All')
@@ -30,7 +39,7 @@ process.maxEvents = cms.untracked.PSet(
 # Input source
 process.source = cms.Source("PoolSource",
                             fileNames = cms.untracked.vstring(
-    options.files
+        'file:/data4/cmkuo/testfiles/test.root'
     )                            
                             )
 
@@ -47,6 +56,7 @@ from TrackingTools.TrackAssociator.default_cfi import *
 
 process.coll = cms.EDAnalyzer("CollisionAnalyzer",
                               TrackAssociatorParameterBlock,
+                              IsCosmic = cms.untracked.bool(True),
                               VtxLabel = cms.InputTag("offlinePrimaryVertices"),
                               GTDigiLabel = cms.InputTag("gtDigis"),
                               ESSimHits = cms.InputTag("g4SimHits:EcalHitsES"),
@@ -56,11 +66,11 @@ process.coll = cms.EDAnalyzer("CollisionAnalyzer",
                               EERecHitLabel = cms.InputTag("ecalRecHit:EcalRecHitsEE"),
                               HERecHitLabel = cms.InputTag("hbhereco"),
                               endcapRawSuperClusterCollection = cms.InputTag("correctedMulti5x5SuperClustersWithPreshower"),
-                              OutputFile = cms.untracked.string(options.output),
+                              OutputFile = cms.untracked.string("collision.root"),
                               LookupTable = cms.untracked.FileInPath("EventFilter/ESDigiToRaw/data/ES_lookup_table.dat")
                               )
 
-process.TFileService = cms.Service("TFileService", fileName = cms.string(options.output))
+process.TFileService = cms.Service("TFileService", fileName = cms.string("collision.root"))
 
 # Output definition
 process.FEVT = cms.OutputModule("PoolOutputModule",
@@ -71,8 +81,17 @@ process.FEVT = cms.OutputModule("PoolOutputModule",
 
 process.esRawToDigi.sourceTag = cms.InputTag("rawDataCollector")
 
-process.p = cms.Path(#process.esRawToDigi*
-                     #process.ecalPreshowerRecHit*
-                     process.coll)
+# Trigger requirements
+import copy
+process.load('HLTrigger.HLTfilters.hltHighLevel_cfi')
+process.leptonHLTFilter = copy.deepcopy(process.hltHighLevel)
+process.leptonHLTFilter.throw = cms.bool(False)
+process.leptonHLTFilter.HLTPaths = ['HLT_L1SingleMuOpen_v*']
+
+process.p = cms.Path(
+    process.esRawToDigi*
+    #process.ecalPreshowerRecHit*
+    process.leptonHLTFilter*
+    process.coll)
 
 
