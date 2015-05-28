@@ -213,50 +213,51 @@ private:
   Float_t en_hem;
   Int_t   nTrk;
   Int_t   nGoodTrk;
-  Float_t trkPt[2000];
-  Float_t trkEta[2000];
-  Float_t trkPhi[2000];
-  Float_t trkOuterPt[2000];
-  Float_t trkOuterX[2000];
-  Float_t trkOuterY[2000];
-  Float_t trkOuterZ[2000];
-  Float_t trkOuterPhi[2000];
-  Float_t trkOuterEta[2000];
-  Float_t trkInnerPt[2000];
-  Float_t trkInnerX[2000];
-  Float_t trkInnerY[2000];
-  Float_t trkInnerZ[2000];
-  Float_t trkInnerPhi[2000];
-  Float_t trkInnerEta[2000];
-  Float_t trkD0[2000];
-  Float_t trkD0Error[2000];
-  Float_t trkNormalizedChi2[2000];
-  Int_t    trkNumOfValidHits[2000];
-  Int_t    trkNumofValidStripHits[2000];
-  Int_t    trkNumofValidStripTIBHits[2000];
-  Int_t    trkNumofValidStripTIDHits[2000];
-  Int_t    trkNumofValidStripTOBHits[2000];
-  Int_t    trkNumofValidStripTECHits[2000];
-  Int_t    trkNumofStripLayer[2000];       
-  Int_t    trkNumofStripTIBLayer[2000];
-  Int_t    trkNumofStripTIDLayer[2000];
-  Int_t    trkNumofStripTOBLayer[2000];
-  Int_t    trkNumofStripTECLayer[2000];
-  Int_t    trkESz[2000][2];
-  Int_t    trkESp[2000][2];
-  Int_t    trkESx[2000][2];
-  Int_t    trkESy[2000][2];
-  Int_t    trkESs[2000][2];
-  Int_t    trkEEz[2000];
-  Int_t    trkEEx[2000];
-  Int_t    trkEEy[2000];
-  Float_t trkEEEta[2000];
-  Float_t trkEEPhi[2000];
-  Float_t trkCaloTowerEta[2000];
-  Float_t trkCaloTowerPhi[2000];
-  Int_t    trkHEz[2000];
-  Float_t trkHEEta[2000];
-  Float_t trkHEPhi[2000];
+  Float_t trkPt[5000];
+  Float_t trkEta[5000];
+  Float_t trkPhi[5000];
+  Float_t trkRho[5000];
+  Float_t trkOuterPt[5000];
+  Float_t trkOuterX[5000];
+  Float_t trkOuterY[5000];
+  Float_t trkOuterZ[5000];
+  Float_t trkOuterPhi[5000];
+  Float_t trkOuterEta[5000];
+  Float_t trkInnerPt[5000];
+  Float_t trkInnerX[5000];
+  Float_t trkInnerY[5000];
+  Float_t trkInnerZ[5000];
+  Float_t trkInnerPhi[5000];
+  Float_t trkInnerEta[5000];
+  Float_t trkD0[5000];
+  Float_t trkD0Error[5000];
+  Float_t trkNormalizedChi2[5000];
+  Int_t    trkNumOfValidHits[5000];
+  Int_t    trkNumofValidStripHits[5000];
+  Int_t    trkNumofValidStripTIBHits[5000];
+  Int_t    trkNumofValidStripTIDHits[5000];
+  Int_t    trkNumofValidStripTOBHits[5000];
+  Int_t    trkNumofValidStripTECHits[5000];
+  Int_t    trkNumofStripLayer[5000];       
+  Int_t    trkNumofStripTIBLayer[5000];
+  Int_t    trkNumofStripTIDLayer[5000];
+  Int_t    trkNumofStripTOBLayer[5000];
+  Int_t    trkNumofStripTECLayer[5000];
+  Int_t    trkESz[5000][2];
+  Int_t    trkESp[5000][2];
+  Int_t    trkESx[5000][2];
+  Int_t    trkESy[5000][2];
+  Int_t    trkESs[5000][2];
+  Int_t    trkEEz[5000];
+  Int_t    trkEEx[5000];
+  Int_t    trkEEy[5000];
+  Float_t trkEEEta[5000];
+  Float_t trkEEPhi[5000];
+  Float_t trkCaloTowerEta[5000];
+  Float_t trkCaloTowerPhi[5000];
+  Int_t   trkHEz[5000];
+  Float_t trkHEEta[5000];
+  Float_t trkHEPhi[5000];
 
   Int_t    nMC;
   Int_t    mcPID[500];
@@ -415,6 +416,7 @@ CollisionAnalyzer::CollisionAnalyzer(const edm::ParameterSet& ps) {
   tree_->Branch("trkPt", trkPt, "trkPt[nTrk]/F");
   tree_->Branch("trkEta", trkEta, "trkEta[nTrk]/F");
   tree_->Branch("trkPhi", trkPhi, "trkPhi[nTrk]/F");
+  tree_->Branch("trkRho", trkRho, "trkRho[nTrk]/F");
   /*
   tree_->Branch("trkOuterPt", trkOuterPt, "trkOuterPt[nTrk]/F");
   tree_->Branch("trkOuterX", trkOuterX, "trkOuterX[nTrk]/F");
@@ -448,7 +450,7 @@ CollisionAnalyzer::CollisionAnalyzer(const edm::ParameterSet& ps) {
   tree_->Branch("trkESx", trkESx, "trkESx[nTrk][2]/I");
   tree_->Branch("trkESy", trkESy, "trkESy[nTrk][2]/I");
   tree_->Branch("trkESs", trkESs, "trkESs[nTrk][2]/I");
-  tree_->Branch("trkEEz", trkEEz, "trkEEz[nTrk]/I");
+  //tree_->Branch("trkEEz", trkEEz, "trkEEz[nTrk]/I");
   //tree_->Branch("trkEEx", trkEEx, "trkEEx[nTrk]/I");
   //tree_->Branch("trkEEy", trkEEy, "trkEEy[nTrk]/I");
   //tree_->Branch("trkEEEta", trkEEEta, "trkEEEta[nTrk]/F");
@@ -740,6 +742,53 @@ void CollisionAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup&
       }
       
       nMu++;    
+    }
+  }
+
+  // Get Tracker track's information
+  Handle<reco::TrackCollection> Tracks;
+  if (iEvent.getByLabel(tracklabel_, Tracks)) {
+    const reco::TrackCollection *track = Tracks.product();
+    
+    trkQuality_ = reco::TrackBase::qualityByName("highPurity");
+    
+    nTrk = 0;
+    nGoodTrk = 0;
+    for (reco::TrackCollection::const_iterator aTrk = track->begin(); aTrk != track->end(); aTrk++) {
+      
+      if (aTrk->quality(trkQuality_)) nGoodTrk++;
+      
+      trkPt[nTrk]  = aTrk->pt();
+      trkEta[nTrk] = aTrk->eta();
+      trkPhi[nTrk] = aTrk->phi();
+      trkRho[nTrk] = fabs(aTrk->vertex().rho());
+
+      // start track association
+      for (int ip=0; ip<2; ++ip) {
+	trkESz[nTrk][ip] = -99;
+	trkESp[nTrk][ip] = -99;
+	trkESx[nTrk][ip] = -99;
+	trkESy[nTrk][ip] = -99;
+	trkESs[nTrk][ip] = -99;
+      }
+
+      //if (aTrk->pt() < 1) continue;
+      //if (fabs(aTrk->vertex().rho()) > 50) continue;
+      //cout<<"trk : "<<aTrk->pt()<<" "<<fabs(aTrk->vertex().rho())<<" "<<aTrk->found()<<endl;      
+      TrackDetMatchInfo trk_info;
+      trk_info = trackAssociator_.associate(iEvent, iSetup, *aTrk, parameters_, direction);
+      
+      for (std::vector<DetId>::const_iterator trk_id = trk_info.crossedPreshowerIds.begin(); trk_id != trk_info.crossedPreshowerIds.end(); ++trk_id) {
+	//GlobalPoint point = trk_info.getPosition(*trk_id);
+	ESDetId trk_esid (trk_id->rawId()) ;
+	trkESz[nTrk][trk_esid.plane()-1] = trk_esid.zside();
+	trkESp[nTrk][trk_esid.plane()-1] = trk_esid.plane();
+	trkESx[nTrk][trk_esid.plane()-1] = trk_esid.six();
+	trkESy[nTrk][trk_esid.plane()-1] = trk_esid.siy();
+	trkESs[nTrk][trk_esid.plane()-1] = trk_esid.strip();
+      }
+
+      nTrk++;
     }
   }
 
