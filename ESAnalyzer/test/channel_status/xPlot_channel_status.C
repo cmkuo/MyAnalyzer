@@ -146,31 +146,49 @@ void xPlot_channel_status() {
 	}
 	in.close();
 
-	TCanvas *c = new TCanvas("c","canvas",1000,1000);
-	c->Divide(2,2);
-	c->cd(1);
+	TCanvas *c = new TCanvas("c","channelStatus_20150704",1000,1200);
+	c->SetTitle("channelStatus_20150704");
+	//c->Divide(2,2);
+	//TPad * padTitle = new TPad("padTitle","padTitle",0.02, 0.02,0.98,0.098);
+	TPaveLabel *pl = new TPaveLabel(0.02, 0.98,0.98,0.902,"channelStatus_20150704","");
+	//pl->SetFillColor(18);
+	//pl->SetTextFont(32);
+	//pl->SetTextColor(49);
+	pl->Draw();
+	TPad * pad1 = new TPad("pad1","pad1",0.5	,0.45	,0		,0.9	);
+	TPad * pad2 = new TPad("pad2","pad2",1		,0.45	,0.5	,0.9	);
+	TPad * pad3 = new TPad("pad3","pad3",0.5	,0		,0		,0.45	);
+	TPad * pad4 = new TPad("pad4","pad4",1		,0		,0.5	,0.45	);
+	pad1->Draw();
+	pad2->Draw();
+	pad3->Draw();
+	pad4->Draw();
+	pad1->cd();
 	CS_PF->GetXaxis()->SetTitle("X");
 	CS_PF->GetYaxis()->SetTitle("Y");
-	CS_PF->Draw("colz");
-	drawBorders(1,1,1);
-	gStyle->SetOptStat(0);
-	c->cd(2);
+	CS_PF->Draw("col");
+	drawBorders(1,1,1);/*
+	TLatex text;
+	text.SetNDC();
+	text.SetTextSize(0.04);
+	text.SetTextFont(42);
+	text.SetTextColor(kBlue);
+	text.SetTextColor(1);
+	text.DrawLatex(0.2, 0.85,"channelStatus_20150704");*/
+	pad2->cd();
 	CS_NF->GetXaxis()->SetTitle("X");
 	CS_NF->GetYaxis()->SetTitle("Y");
-	CS_NF->Draw("colz");
-	gStyle->SetOptStat(0);
+	CS_NF->Draw("col");
 	drawBorders(2,1,1); 
-	c->cd(3);
+	pad3->cd();
 	CS_PR->GetXaxis()->SetTitle("X");
 	CS_PR->GetYaxis()->SetTitle("Y");
-	CS_PR->Draw("colz");
+	CS_PR->Draw("col");
 	drawBorders(3,1,1); 
-	gStyle->SetOptStat(0);
-	c->cd(4);
+	pad4->cd();
 	CS_NR->GetXaxis()->SetTitle("X");
 	CS_NR->GetYaxis()->SetTitle("Y");
-	CS_NR->Draw("colz");
+	CS_NR->Draw("col");
 	drawBorders( 4, 1, 1);
-	gStyle->SetOptStat(0);
 	c->SaveAs("ES_channel_status.png");
 }
