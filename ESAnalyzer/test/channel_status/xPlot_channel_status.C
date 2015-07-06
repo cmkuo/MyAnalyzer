@@ -122,19 +122,17 @@ void drawBorders( int plane, float sx, float sy ) {
 	}
 }
 
-void xPlot_channel_status() {
+void xPlot_channel_status(Int_t hname) {
 	gStyle->SetOptStat(0);
-
 	TH2F *CS_PF = new TH2F("CS_PF","Channel Status ES+F",40,1,41,40,1,41);
 	TH2F *CS_NF = new TH2F("CS_NF","Channel Status ES-F",40,1,41,40,1,41);
 	TH2F *CS_PR = new TH2F("CS_PR","Channel Status ES+R",40,1,41,40,1,41);
 	TH2F *CS_NR = new TH2F("CS_NR","Channel Status ES-R",40,1,41,40,1,41);
-	
 	int z[4251],p[4251],x[4251],y[4251];
-	Char_t hname[500];
 	ifstream in;
-	sprintf(hname, "channelStatus_20150704.txt");
-	in.open(hname);
+	Char_t hname2[500];
+	sprintf(hname2, "channelStatus_%d.txt", hname);
+	in.open(hname2); 
 	int max; in >> max;
 	for (int n=0;n<max;n++){
 		in >>z[n]>>p[n]>>x[n]>>y[n];
@@ -146,15 +144,10 @@ void xPlot_channel_status() {
 		if (z[n]==-1 && p[n]==2) CS_NR->Fill(x[n],y[n],1);
 	}
 	in.close();
-
-	TCanvas *c = new TCanvas("c","channelStatus_20150704",1000,1200);
-	c->SetTitle("channelStatus_20150704");
-	//c->Divide(2,2);
-	//TPad * padTitle = new TPad("padTitle","padTitle",0.02, 0.02,0.98,0.098);
-	TPaveLabel *pl = new TPaveLabel(0.02, 0.98,0.98,0.902,"Channel Status 20150704","");
-	//pl->SetFillColor(18);
-	//pl->SetTextFont(32);
-	//pl->SetTextColor(49);
+	char hname3[500];
+	sprintf(hname3, "Channel Status %d", hname);
+	TCanvas *c = new TCanvas("c","channelStatus",1000,1200);
+	TPaveLabel *pl = new TPaveLabel(0.02, 0.98,0.98,0.902, hname3 ,"br"); //title
 	pl->Draw();
 	TPad * pad1 = new TPad("pad1","pad1",0.5	,0.45	,0		,0.9	);
 	TPad * pad2 = new TPad("pad2","pad2",1		,0.45	,0.5	,0.9	);
@@ -168,14 +161,7 @@ void xPlot_channel_status() {
 	CS_PF->GetXaxis()->SetTitle("Si X");
 	CS_PF->GetYaxis()->SetTitle("Si Y");
 	CS_PF->Draw("col");
-	drawBorders(1,1,1);/*
-	TLatex text;
-	text.SetNDC();
-	text.SetTextSize(0.04);
-	text.SetTextFont(42);
-	text.SetTextColor(kBlue);
-	text.SetTextColor(1);
-	text.DrawLatex(0.2, 0.85,"channelStatus_20150704");*/
+	drawBorders(1,1,1);
 	pad2->cd();
 	CS_NF->GetXaxis()->SetTitle("Si X");
 	CS_NF->GetYaxis()->SetTitle("Si Y");
@@ -191,7 +177,6 @@ void xPlot_channel_status() {
 	CS_NR->GetYaxis()->SetTitle("Si Y");
 	CS_NR->Draw("col");
 	drawBorders( 4, 1, 1);
-	Char_t hname2[500];
-	sprintf(hname2, "ES_plot_%s_result.png", hname);
+	sprintf(hname2, "ES_plot_%d_result.png", hname);
 	c->SaveAs(hname2);
 }
