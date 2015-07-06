@@ -150,7 +150,7 @@ void xPlot_channel_status() {
 	c->SetTitle("channelStatus_20150704");
 	//c->Divide(2,2);
 	//TPad * padTitle = new TPad("padTitle","padTitle",0.02, 0.02,0.98,0.098);
-	TPaveLabel *pl = new TPaveLabel(0.02, 0.98,0.98,0.902,"channelStatus_20150704","");
+	TPaveLabel *pl = new TPaveLabel(0.02, 0.98,0.98,0.902,"Channel Status 20150704","");
 	//pl->SetFillColor(18);
 	//pl->SetTextFont(32);
 	//pl->SetTextColor(49);
