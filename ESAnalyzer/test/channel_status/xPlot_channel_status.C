@@ -133,7 +133,8 @@ void xPlot_channel_status() {
 	int z[4251],p[4251],x[4251],y[4251];
 	Char_t hname[500];
 	ifstream in;
-	in.open("channelStatus_20150704.txt");
+	sprintf(hname, "channelStatus_20150704.txt");
+	in.open(hname);
 	int max; in >> max;
 	for (int n=0;n<max;n++){
 		in >>z[n]>>p[n]>>x[n]>>y[n];
@@ -164,8 +165,8 @@ void xPlot_channel_status() {
 	pad3->Draw();
 	pad4->Draw();
 	pad1->cd();
-	CS_PF->GetXaxis()->SetTitle("X");
-	CS_PF->GetYaxis()->SetTitle("Y");
+	CS_PF->GetXaxis()->SetTitle("Si X");
+	CS_PF->GetYaxis()->SetTitle("Si Y");
 	CS_PF->Draw("col");
 	drawBorders(1,1,1);/*
 	TLatex text;
@@ -176,19 +177,21 @@ void xPlot_channel_status() {
 	text.SetTextColor(1);
 	text.DrawLatex(0.2, 0.85,"channelStatus_20150704");*/
 	pad2->cd();
-	CS_NF->GetXaxis()->SetTitle("X");
-	CS_NF->GetYaxis()->SetTitle("Y");
+	CS_NF->GetXaxis()->SetTitle("Si X");
+	CS_NF->GetYaxis()->SetTitle("Si Y");
 	CS_NF->Draw("col");
 	drawBorders(2,1,1); 
 	pad3->cd();
-	CS_PR->GetXaxis()->SetTitle("X");
-	CS_PR->GetYaxis()->SetTitle("Y");
+	CS_PR->GetXaxis()->SetTitle("Si X");
+	CS_PR->GetYaxis()->SetTitle("Si Y");
 	CS_PR->Draw("col");
 	drawBorders(3,1,1); 
 	pad4->cd();
-	CS_NR->GetXaxis()->SetTitle("X");
-	CS_NR->GetYaxis()->SetTitle("Y");
+	CS_NR->GetXaxis()->SetTitle("Si X");
+	CS_NR->GetYaxis()->SetTitle("Si Y");
 	CS_NR->Draw("col");
 	drawBorders( 4, 1, 1);
-	c->SaveAs("ES_channel_status.png");
+	Char_t hname2[500];
+	sprintf(hname2, "ES_plot_%s_result.png", hname);
+	c->SaveAs(hname2);
 }
