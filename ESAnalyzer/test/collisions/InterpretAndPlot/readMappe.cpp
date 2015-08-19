@@ -116,11 +116,19 @@ int main(int argc, char* argv[])
       if(time > -900 && iL != "058") {
 	map_Z0P0->Fill(iX, iY, lad_time[iL] / lad_N[iL]);
 	map_Z0P0_check->Fill(iX, iY, time);
+
+	/*
  	if(ix == 24 || ix == 23) {
  	  std::cout << "iz = " << iz << " ip = " << ip << " ix = " << ix << " iy = " << iy << std::endl;
  	  std::cout << " >>> lad_time[iL] / lad_N[iL] = " << lad_time[iL] / lad_N[iL] << std::endl;
  	  std::cout << " >>> lad_time[iL] = " << lad_time[iL] << std::endl;
  	}
+	*/
+
+	if( fabs(lad_time[iL] / lad_N[iL]) > 1){
+	  std::cout << iZ << " /t " << iP << " /t " << iL << " /t " <<  lad_time[iL] / lad_N[iL] << std::endl;
+	}
+
       }
       if(iL == "058") 	{
 	map_Z0P0->Fill(iX, iY, -20.);
