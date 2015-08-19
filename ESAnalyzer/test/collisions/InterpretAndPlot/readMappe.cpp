@@ -102,6 +102,9 @@ int main(int argc, char* argv[])
   inFileLong.close ();
   inFileTime.close ();
 
+  std::string iL_pre = "nan";
+  int iT_pre = -1;
+
   //  std::ifstream inFileLong;
   //  inFileTime.open(Form("SensorLadder_map/timingSensor_Z%dP%d.txt", Zside_i, Pside_i), std::ios::in);
   inFileTime.open(Form("SensorLadder_map/timingSensor_RunB_LG_Z%dP%d.txt", Zside_i, Pside_i), std::ios::in);
@@ -125,8 +128,11 @@ int main(int argc, char* argv[])
  	}
 	*/
 
-	if( fabs(lad_time[iL] / lad_N[iL]) > 1){
-	  std::cout << iZ << " /t " << iP << " /t " << iL << " /t " <<  lad_time[iL] / lad_N[iL] << std::endl;
+
+	if( fabs(lad_time[iL] / lad_N[iL]) > 1 && iL != iL_pre && iT_pre != (lad_time[iL] / lad_N[iL])){
+	  std::cout << iZ << " \t " << iP << " \t " << iL << " \t " <<  lad_time[iL] / lad_N[iL] << std::endl;
+	  iL_pre = iL;
+	  iT_pre = lad_time[iL] / lad_N[iL];
 	}
 
       }
