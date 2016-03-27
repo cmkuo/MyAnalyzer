@@ -46,8 +46,8 @@ class ESSplashAnalyzer : public edm::EDAnalyzer {
   
   string outputFile_;
   string hotFile_;
-  InputTag digilabel_;
-  InputTag rechitlabel_;
+  EDGetTokenT<ESDigiCollection> digilabel_;
+  EDGetTokenT<EcalRecHitCollection> rechitlabel_;
   InputTag eerechitlabel_;
   InputTag herechitlabel_;
   bool dumpTree_;
@@ -80,8 +80,8 @@ ESSplashAnalyzer::ESSplashAnalyzer(const edm::ParameterSet& ps) {
   
   outputFile_     = ps.getUntrackedParameter<string>("OutputFile");
   hotFile_        = ps.getUntrackedParameter<string>("HotChannelFile");
-  digilabel_      = ps.getParameter<InputTag>("DigiLabel");
-  rechitlabel_    = ps.getParameter<InputTag>("RecHitLabel");
+  digilabel_      = consumes<ESDigiCollection>(ps.getParameter<InputTag>("DigiLabel"));
+  rechitlabel_    = consumes<EcalRecHitCollection>(ps.getParameter<InputTag>("RecHitLabel"));
   eerechitlabel_  = ps.getParameter<InputTag>("EERecHitLabel");
   herechitlabel_  = ps.getParameter<InputTag>("HERecHitLabel");
   lookup_         = ps.getUntrackedParameter<FileInPath>("LookupTable");
@@ -198,7 +198,7 @@ void ESSplashAnalyzer::analyze(const edm::Event& e, const edm::EventSetup& iSetu
   */
   Handle<ESDigiCollection> digis;
   try {
-    e.getByLabel(digilabel_, digis);
+    e.getByToken(digilabel_, digis);
   } catch ( cms::Exception &e ) {
     LogDebug("") << "Error! can't get digi collection !" << std::endl;
   }
@@ -246,7 +246,7 @@ void ESSplashAnalyzer::analyze(const edm::Event& e, const edm::EventSetup& iSetu
 
   int zside, plane, ix, iy, strip, iz;
   for (ESDigiCollection::const_iterator digiItr = digis->begin(); digiItr != digis->end(); ++digiItr) {
-    
+
     ESDataFrame dataframe = (*digiItr);
     ESDetId id = dataframe.id();
 
@@ -263,11 +263,11 @@ void ESSplashAnalyzer::analyze(const edm::Event& e, const edm::EventSetup& iSetu
     ADC0_[iz][plane-1][ix-1][iy-1][strip-1] = dataframe.sample(0).adc();
     ADC1_[iz][plane-1][ix-1][iy-1][strip-1] = dataframe.sample(1).adc();
     ADC2_[iz][plane-1][ix-1][iy-1][strip-1] = dataframe.sample(2).adc();
-
     data_S0[iz][plane-1][ix-1][iy-1][strip-1] = dataframe.sample(0).adc();    //storing S0 data
     data_S1[iz][plane-1][ix-1][iy-1][strip-1] = dataframe.sample(1).adc();    //storing S1 data
     data_S2[iz][plane-1][ix-1][iy-1][strip-1] = dataframe.sample(2).adc();    //storing S2 data
 
+    //if (iz == 0 && plane == 1 && ix > 10 && ix < 30 && iy < 25 && iy > 10)
     //cout<<iz<<" "<<plane<<" "<<ix<<" "<<iy<<" "<<strip<<" "<<dataframe.sample(0).adc()<<" "<<dataframe.sample(1).adc()<<" "<<dataframe.sample(2).adc()<<endl;
     nESHits++;
   }
@@ -331,7 +331,7 @@ void ESSplashAnalyzer::analyze(const edm::Event& e, const edm::EventSetup& iSetu
 
   // ES RecHits
   Handle<ESRecHitCollection> ESRecHit;
-  if ( e.getByLabel(rechitlabel_, ESRecHit) ) {
+  if ( e.getByToken(rechitlabel_, ESRecHit) ) {
 
     for (ESRecHitCollection::const_iterator hitItr = ESRecHit->begin(); hitItr != ESRecHit->end(); ++hitItr) {
 
@@ -346,6 +346,9 @@ void ESSplashAnalyzer::analyze(const edm::Event& e, const edm::EventSetup& iSetu
       iz = (zside==1) ? 0:1;
       RH_[iz][plane-1][ix-1][iy-1][strip-1] = hitItr->energy();
        
+
+      //if (iz == 0 && plane == 1 && ix > 10 && ix < 30 && iy < 25 && iy > 10)
+      //cout<<iz<<" "<<plane<<" "<<ix<<" "<<iy<<" "<<strip<<" "<<hitItr->energy()<<endl;
     }
   } 
 
@@ -378,7 +381,7 @@ void ESSplashAnalyzer::analyze(const edm::Event& e, const edm::EventSetup& iSetu
 
     }
   }
-  
+
   if (dumpTree_ && nESHits > NumberOfESHitsThreshold_) tree_->Fill();
 
 }

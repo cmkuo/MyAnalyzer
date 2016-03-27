@@ -8,28 +8,28 @@ options = VarParsing.VarParsing ('standard')
 
 # setup any defaults you want
 #options.files = '/store/caf/user/ccecal/TPG/splashes_239754_5events_April2015_MinimumBias.root'
-options.files = '/store/caf/user/ccecal/TPG/SplashLikeEvents_2015_run239821.root'
-options.output = 'beamsplash_00239821.root'
+#options.files = '/store/caf/user/ccecal/TPG/SplashLikeEvents_2015_run239821.root'
+#options.files = 'root://eoscms//eos/cms/tier0/store/data/Commissioning2016/MinimumBias/RAW/v1/000/267/931/00000/362AE1DA-77F2-E511-A403-02163E013917.root'
+options.files = 'root://eoscms//eos/cms/tier0/store/data/Commissioning2016/MinimumBias/RAW/v1/000/267/931/00000/AC05DAEA-77F2-E511-BDF8-02163E014419.root'
+options.output = 'beamsplash_00267931.root'
 options.parseArguments()
 
 process.load("FWCore.MessageLogger.MessageLogger_cfi")
 
-#process.load("DQM.Integration.test.FrontierCondition_GT_cfi")
-process.load("DQM.Integration.test.FrontierCondition_GT_Offline_cfi") 
+process.load('Configuration.StandardSequences.FrontierConditions_GlobalTag_condDBv2_cff')
+from Configuration.AlCa.GlobalTag_condDBv2 import GlobalTag
+process.GlobalTag = GlobalTag(process.GlobalTag, 'auto:run2_data', '')
 
 process.maxEvents = cms.untracked.PSet(
-        input = cms.untracked.int32(-1)
+        input = cms.untracked.int32(1)
         )
 
 #process.source = cms.Source('NewEventStreamFileReader',
 process.source = cms.Source("PoolSource",
                             fileNames = cms.untracked.vstring(
     options.files
-        #'/store/express/Commissioning2015/ExpressCosmics/FEVT/Express-v1/000/239/821/00000/C8004CC8-64DC-E411-8DCB-02163E0133B2.root'
-        #'/store/express/Commissioning2015/ExpressCosmics/FEVT/Express-v1/000/239/754/00000/30C3CEC6-6EDB-E411-A2E3-02163E0136CE.root',
-        #'/store/express/Commissioning2015/ExpressCosmics/FEVT/Express-v1/000/239/754/00000/4010520D-70DB-E411-9C96-02163E01367A.root',
-        #'/store/express/Commissioning2015/ExpressCosmics/FEVT/Express-v1/000/239/754/00000/E02FF3C0-6FDB-E411-9B8B-02163E0136CE.root'
-    )
+    ),
+                            skipEvents=cms.untracked.uint32(10)
                             )
 
 process.load("EventFilter.ESRawToDigi.esRawToDigi_cfi")
@@ -40,7 +40,7 @@ process.load('RecoLocalCalo.EcalRecProducers.ecalPreshowerRecHit_cfi')
 process.ecalPreshowerRecHit.ESdigiCollection = cms.InputTag("esRawToDigi")
 
 process.splash = cms.EDAnalyzer("ESSplashAnalyzer",
-                                DigiLabel = cms.InputTag("esRawToDigi"),
+                                DigiLabel = cms.InputTag("esRawToDigi::Demo"),
                                 RecHitLabel = cms.InputTag("ecalPreshowerRecHit:EcalRecHitsES:Demo"),
                                 EERecHitLabel = cms.InputTag('ecalRecHit:EcalRecHitsEE'),
                                 HERecHitLabel = cms.InputTag('hbhereco'),
@@ -51,12 +51,11 @@ process.splash = cms.EDAnalyzer("ESSplashAnalyzer",
                                 NumberOfESHitsThreshold = cms.untracked.int32(0)
                                 )
 
-#process.patOutputModule = cms.OutputModule("PoolOutputModule",
-#                                           fileName = cms.untracked.string('output.root')
-#                                           )
-#process.out = cms.EndPath(process.patOutputModule)
-
 process.p = cms.Path(process.esRawToDigi*
                      process.ecalPreshowerRecHit*
                      process.splash)
 
+#process.patOutputModule = cms.OutputModule("PoolOutputModule",
+#                                           fileName = cms.untracked.string('output.root')
+#                                           )
+#process.out = cms.EndPath(process.patOutputModule)
