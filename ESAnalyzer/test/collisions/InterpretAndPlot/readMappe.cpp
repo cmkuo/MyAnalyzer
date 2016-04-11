@@ -1,5 +1,7 @@
 //g++ -Wall -o readMappe `root-config --cflags --glibs` readMappe.cpp
 // ./readMappe Zside Pside
+//to run as last
+
 
 #include "TROOT.h"
 #include "TStyle.h"
@@ -73,7 +75,8 @@ int main(int argc, char* argv[])
 
   std::ifstream inFileTime;
   //  inFileTime.open(Form("SensorLadder_map/timingSensor_Z%dP%d.txt", Zside_i, Pside_i), std::ios::in);
-  inFileTime.open(Form("SensorLadder_map/timingSensor_RunB_LG_Z%dP%d.txt", Zside_i, Pside_i), std::ios::in);
+  //  inFileTime.open(Form("SensorLadder_map/timingSensor_RunB_LG_Z%dP%d.txt", Zside_i, Pside_i), std::ios::in);
+  inFileTime.open(Form("dataMap/timingSensor_beamsplash_00268006_Z%dP%d.txt", Zside_i, Pside_i), std::ios::in);
 
   int line = 0;
   std::ifstream inFileLong;
@@ -85,7 +88,7 @@ int main(int argc, char* argv[])
       //      std::cout << " ix = " << ix << " iy = " << iy << std::endl;
 
       if(iZ != iz || iP != ip || ix != iX || iy != iY) {
-	std::cout << " serius problem " << std::endl;	
+	std::cout << " mismatch in sensor " << std::endl;	
 	std::cout << " line = " << line << std::endl;
 	std::cout << "iZ = " << iZ << " iP = " << iP << " iX = " << iX << " iY = " << iY << std::endl;
 	std::cout << "iz = " << iz << " ip = " << ip << " ix = " << ix << " iy = " << iy << std::endl;
@@ -107,7 +110,7 @@ int main(int argc, char* argv[])
 
   //  std::ifstream inFileLong;
   //  inFileTime.open(Form("SensorLadder_map/timingSensor_Z%dP%d.txt", Zside_i, Pside_i), std::ios::in);
-  inFileTime.open(Form("SensorLadder_map/timingSensor_RunB_LG_Z%dP%d.txt", Zside_i, Pside_i), std::ios::in);
+  inFileTime.open(Form("dataMap/timingSensor_beamsplash_00268006_Z%dP%d.txt", Zside_i, Pside_i), std::ios::in);
   inFileLong.open(Form("SensorLadder_map/outMap_Z%dP%d.txt", Zside_i, Pside_i), std::ios::in);
   while (!inFileLong.eof())
     {
@@ -115,35 +118,25 @@ int main(int argc, char* argv[])
       inFileTime >> iz >> ip >> ix >> iy >> time >> rms >> chi2 >> occ;
       //std::cout << " ix = " << ix << " iy = " << iy << " t = " << time << " rms = " << rms << " chi2 = " << chi2 << " occ = " << occ << std::endl;
 
-
-      if(time > -900 && iL != "058") {
+      //why != 058??? => in Run1 was rejected    
+      //      if(time > -900 && iL != "058"){
+      //try with in Run2
+      if(time > -900){
 	map_Z0P0->Fill(iX, iY, lad_time[iL] / lad_N[iL]);
 	map_Z0P0_check->Fill(iX, iY, time);
-
-	/*
- 	if(ix == 24 || ix == 23) {
- 	  std::cout << "iz = " << iz << " ip = " << ip << " ix = " << ix << " iy = " << iy << std::endl;
- 	  std::cout << " >>> lad_time[iL] / lad_N[iL] = " << lad_time[iL] / lad_N[iL] << std::endl;
- 	  std::cout << " >>> lad_time[iL] = " << lad_time[iL] << std::endl;
- 	}
-	*/
-
-
+	//print ladder timing
 	if( fabs(lad_time[iL] / lad_N[iL]) > 1 && iL != iL_pre && iT_pre != (lad_time[iL] / lad_N[iL])){
 	  std::cout << iZ << " \t " << iP << " \t " << iL << " \t " <<  lad_time[iL] / lad_N[iL] << std::endl;
 	  iL_pre = iL;
 	  iT_pre = lad_time[iL] / lad_N[iL];
 	}
-
       }
-      if(iL == "058") 	{
+      /*
+      if(iL == "058"){
 	map_Z0P0->Fill(iX, iY, -20.);
 	map_Z0P0_check->Fill(iX, iY, time);
       }
-//       else{
-// 	map_Z0P0->Fill(ix, iy, lad_time[il] / lad_N[il]);
-//         map_Z0P0_check->Fill(ix, iy, time);
-//      }
+      */
     }
   inFileLong.close ();
 
@@ -158,7 +151,7 @@ int main(int argc, char* argv[])
     }
   }
 
-
+  std::string plotFolder = "dataMap/mappe/";
 
   TCanvas* cc = new TCanvas();
   //      gPad->SetLogz();
@@ -171,8 +164,8 @@ int main(int argc, char* argv[])
   //      mapT[i][j]->GetZaxis()->SetRangeUser(-20., 20.);
   map_Z0P0->GetZaxis()->SetRangeUser(-10., 10.);
   map_Z0P0->Draw("colz");
-  cc->Print(Form("Run2015_B/mappe_Run2015_B/Average_timing_Z%dP%d.png", Zside_i, Pside_i), "png");
-  cc->Print(Form("Run2015_B/mappe_Run2015_B/Average_timing_Z%dP%d.pdf", Zside_i, Pside_i), "pdf");
+  cc->Print((plotFolder+Form("Average_timing_Z%dP%d.png", Zside_i, Pside_i)).c_str(), "png");
+  cc->Print((plotFolder+Form("Average_timing_Z%dP%d.pdf", Zside_i, Pside_i)).c_str(), "pdf");
 
   //      gPad->SetLogz();
   cc->cd();
@@ -184,8 +177,8 @@ int main(int argc, char* argv[])
   //mapT[i][j]->GetZaxis()->SetRangeUser(-20., 20.);
   map_Z0P0_check->GetZaxis()->SetRangeUser(-10., 10.);
   map_Z0P0_check->Draw("colz");
-  cc->Print(Form("Run2015_B/mappe_Run2015_B/Average_timing_Z%dP%d_check.png", Zside_i, Pside_i), "png");
-  cc->Print(Form("Run2015_B/mappe_Run2015_B/Average_timing_Z%dP%d_check.pdf", Zside_i, Pside_i), "pdf");
+  cc->Print((plotFolder+Form("Average_timing_Z%dP%d_check.png", Zside_i, Pside_i)).c_str(), "png");
+  cc->Print((plotFolder+Form("Average_timing_Z%dP%d_check.pdf", Zside_i, Pside_i)).c_str(), "pdf");
  
   return 0;
  
