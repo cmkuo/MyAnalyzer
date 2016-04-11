@@ -14,15 +14,16 @@ process = cms.Process('RECOES')
 # import of standard configurations
 #process.load("Configuration.StandardSequences.MagneticField_cff")
 process.load("Configuration.StandardSequences.MagneticField_AutoFromDBCurrent_cff")
-process.load("Configuration.StandardSequences.Geometry_cff")
-process.load("Configuration.StandardSequences.GeometryExtended_cff")
+process.load("Configuration.StandardSequences.GeometryDB_cff")
+#process.load("Configuration.StandardSequences.GeometryExtended_cff")
 process.load("Geometry.CommonDetUnit.bareGlobalTrackingGeometry_cfi")
 process.load("TrackPropagation.SteppingHelixPropagator.SteppingHelixPropagatorAlong_cfi")
 process.load("TrackPropagation.SteppingHelixPropagator.SteppingHelixPropagatorOpposite_cfi")
 process.load("TrackPropagation.SteppingHelixPropagator.SteppingHelixPropagatorAny_cfi")
 
-process.load("Configuration.StandardSequences.FrontierConditions_GlobalTag_cff")
-process.GlobalTag.globaltag = cms.string('GR_P_V54::All')
+process.load('Configuration.StandardSequences.FrontierConditions_GlobalTag_condDBv2_cff')
+from Configuration.AlCa.GlobalTag_condDBv2 import GlobalTag
+process.GlobalTag = GlobalTag(process.GlobalTag, 'auto:run2_data', '')
 
 process.maxEvents = cms.untracked.PSet(
     input = cms.untracked.int32(250)
@@ -32,7 +33,8 @@ process.maxEvents = cms.untracked.PSet(
 #process.source = cms.Source("NewEventStreamFileReader",
 process.source = cms.Source("PoolSource",
                             fileNames = cms.untracked.vstring(
-        '/store/data/Commissioning2015/MinimumBias/RAW/v1/000/245/162/00000/36836B63-4BFF-E411-A3EC-02163E012462.root'
+        '/store/data/Commissioning2016/MinimumBias/RAW/v1/000/265/655/00000/8A5C40D3-E1DC-E511-82EE-02163E012A67.root'
+        #'/store/data/Commissioning2015/MinimumBias/RAW/v1/000/245/162/00000/36836B63-4BFF-E411-A3EC-02163E012462.root'
     #options.files
     )                            
                             )
@@ -58,6 +60,8 @@ process.coll = cms.EDAnalyzer("CollisionAnalyzer",
                               TrackLabel = cms.InputTag("generalTracks"),
                               EERecHitLabel = cms.InputTag("ecalRecHit:EcalRecHitsEE"),
                               HERecHitLabel = cms.InputTag("hbhereco"),
+                              genParticleSrc = cms.InputTag("genParticles"),
+                              MuonLabel = cms.InputTag("muons"),
                               endcapRawSuperClusterCollection = cms.InputTag("correctedMulti5x5SuperClustersWithPreshower"),
                               OutputFile = cms.untracked.string("collision.root"),
                               LookupTable = cms.untracked.FileInPath("EventFilter/ESDigiToRaw/data/ES_lookup_table.dat")
