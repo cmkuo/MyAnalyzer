@@ -150,7 +150,7 @@ void drawBorders( int plane, float sx, float sy ) {
   }
 }
 
-void xFitShapeAll(Int_t runId=239895) {
+void xFitShapeAll(Int_t runId=268006) {
   
   //Reset ROOT and connect tree file
   gROOT->Reset();
@@ -248,7 +248,7 @@ void xFitShapeAll(Int_t runId=239895) {
     hesmr->Reset();
 
     nAnalyzedEvents++;
-    if (nAnalyzedEvents < 18) continue;
+    //if (nAnalyzedEvents < 18) continue;
     //if (run==239895 && event!=46482) continue;
     //if (bx != 207) continue;
     evId = event;
@@ -453,7 +453,7 @@ void xFitShapeAll(Int_t runId=239895) {
     sprintf(tname, "ADC1_%d_%d_%d_bx%d.png", runId, lumis, evId, bx);  
     c4->Print(tname);
     
-    //cin.get();
+    cin.get();
   }
 
 }

@@ -151,7 +151,7 @@ const int  lsES[54] = { // line style
    }
 }
 
-void xEventDisplay(Int_t runId=239895) {
+void xEventDisplay(Int_t runId=268006) {
 
   //Reset ROOT and connect tree file
   gROOT->Reset();
@@ -228,7 +228,7 @@ void xEventDisplay(Int_t runId=239895) {
   for (Long64_t i=0; i<nentries;i++) {
     nbytes += EventTree->GetEntry(i);
 
-    //if (event != 46482) continue;
+    //if (event != 230) continue;
     Int_t evId = event;
 
     for (int j=0; j<2; ++j) 
@@ -262,9 +262,9 @@ void xEventDisplay(Int_t runId=239895) {
 		gr->Fit("func", "MQ");
 		func->GetParameters(para);
 		*/
-		para[0] = RH[z][p][x][y][j]*1000000./81.08*55.;
-		
+		para[0] = RH[z][p][x][y][j]*1000000./81.08*55.;		
 		//cout<<z<<" "<<p<<" "<<x<<" "<<y<<" "<<j<<" "<<para[0]<<endl;
+
 		if (para[0] > 0) {
 		  h2[z][p]->Fill(x+1, y+1, para[0]);
 		  hmu[z][p]->Fill(x+1, y+1, para[0]/55.);
@@ -372,7 +372,7 @@ void xEventDisplay(Int_t runId=239895) {
     cout<<"ES-F : "<<energyDensity[1][0]/(nStrips[1][0]*6.1*6.1/32)<<" # of Strips : "<<nStrips[1][0]<<endl;
     cout<<"ES-R : "<<energyDensity[1][1]/(nStrips[1][1]*6.1*6.1/32)<<" # of Strips : "<<nStrips[1][1]<<endl;
 
-    //cin.get();
+    cin.get();
   }
 
 }

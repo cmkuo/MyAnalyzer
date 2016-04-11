@@ -25,7 +25,7 @@ Double_t fitf(Double_t *x, Double_t *par) {
   return v;
 }
 
-void xFitShapeRing(Int_t runId=120041, Int_t endcap=1, Int_t ring=1) {
+void xFitShapeRing(Int_t runId=267996, Int_t endcap=1, Int_t ring=1) {
 
   //Reset ROOT and connect tree file
   gROOT->Reset();
@@ -33,7 +33,7 @@ void xFitShapeRing(Int_t runId=120041, Int_t endcap=1, Int_t ring=1) {
   //gStyle->SetOptFit(kFALSE);
   gStyle->SetOptTitle(kTRUE);  
   Char_t fname[200];
-  sprintf(fname, "/data3/ncuhep/splash/ana/splash_%08d.root", runId);
+  sprintf(fname, "beamsplash_%08d.root", runId);
   TFile *f = new TFile(fname);
   TTree *EventTree = (TTree*) f->Get("EventTree");
   

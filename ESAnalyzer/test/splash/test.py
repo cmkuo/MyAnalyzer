@@ -10,8 +10,8 @@ options = VarParsing.VarParsing ('standard')
 #options.files = '/store/caf/user/ccecal/TPG/splashes_239754_5events_April2015_MinimumBias.root'
 #options.files = '/store/caf/user/ccecal/TPG/SplashLikeEvents_2015_run239821.root'
 #options.files = 'root://eoscms//eos/cms/tier0/store/data/Commissioning2016/MinimumBias/RAW/v1/000/267/931/00000/362AE1DA-77F2-E511-A403-02163E013917.root'
-options.files = 'root://eoscms//eos/cms/tier0/store/data/Commissioning2016/MinimumBias/RAW/v1/000/267/931/00000/AC05DAEA-77F2-E511-BDF8-02163E014419.root'
-options.output = 'beamsplash_00267931.root'
+options.files = 'root://eoscms//eos/cms/store/caf/user/ccecal/TPG/splash_events_2016_run268006.root'
+options.output = 'beamsplash_00268006.root'
 options.parseArguments()
 
 process.load("FWCore.MessageLogger.MessageLogger_cfi")
@@ -21,15 +21,15 @@ from Configuration.AlCa.GlobalTag_condDBv2 import GlobalTag
 process.GlobalTag = GlobalTag(process.GlobalTag, 'auto:run2_data', '')
 
 process.maxEvents = cms.untracked.PSet(
-        input = cms.untracked.int32(1)
+        input = cms.untracked.int32(-1)
         )
 
 #process.source = cms.Source('NewEventStreamFileReader',
 process.source = cms.Source("PoolSource",
                             fileNames = cms.untracked.vstring(
     options.files
-    ),
-                            skipEvents=cms.untracked.uint32(10)
+    )#,
+#                            skipEvents=cms.untracked.uint32(10)
                             )
 
 process.load("EventFilter.ESRawToDigi.esRawToDigi_cfi")
