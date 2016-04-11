@@ -92,12 +92,14 @@ private:
   virtual void analyze(const edm::Event&, const edm::EventSetup&);
   virtual void endJob() ;
   
-  InputTag vtxlabel_;
-  InputTag esSimHits_;
+  edm::EDGetTokenT<reco::GenParticleCollection> genParticlesCollection_;
+  edm::EDGetTokenT<reco::VertexCollection>      vtxLabel_;
+  edm::EDGetTokenT<PCaloHitContainer>           esSimHits_;
   InputTag gtdigilabel_;
-  InputTag digilabel_;
-  InputTag rechitlabel_;
-  InputTag tracklabel_;
+  edm::EDGetTokenT<ESDigiCollection>            digilabel_;
+  edm::EDGetTokenT<ESRecHitCollection>          rechitlabel_;
+  edm::EDGetTokenT<MuonCollection>              muonCollection_;
+  edm::EDGetTokenT<TrackCollection>             tracklabel_;
   InputTag eerechitlabel_;
   InputTag herechitlabel_;
   InputTag endcapRawSuperClusterCollection_;
@@ -294,15 +296,17 @@ private:
 
 CollisionAnalyzer::CollisionAnalyzer(const edm::ParameterSet& ps) {
 
-  vtxlabel_         = ps.getParameter<InputTag>("VtxLabel");
-  esSimHits_        = ps.getParameter<InputTag>("ESSimHits");
+  genParticlesCollection_ = consumes<reco::GenParticleCollection> (ps.getParameter<InputTag>("genParticleSrc"));
+  vtxLabel_         = consumes<reco::VertexCollection>            (ps.getParameter<InputTag>("VtxLabel"));
+  esSimHits_        = consumes<PCaloHitContainer>                 (ps.getParameter<InputTag>("ESSimHits"));
   gtdigilabel_      = ps.getParameter<InputTag>("GTDigiLabel");
-  digilabel_        = ps.getParameter<InputTag>("DigiLabel");
-  rechitlabel_      = ps.getParameter<InputTag>("RecHitLabel");
-  tracklabel_       = ps.getParameter<InputTag>("TrackLabel");
+  digilabel_        = consumes<ESDigiCollection>                  (ps.getParameter<InputTag>("DigiLabel"));
+  rechitlabel_      = consumes<ESRecHitCollection>                (ps.getParameter<InputTag>("RecHitLabel"));
+  tracklabel_       = consumes<TrackCollection>                   (ps.getParameter<InputTag>("TrackLabel"));
   eerechitlabel_    = ps.getParameter<InputTag>("EERecHitLabel");
   herechitlabel_    = ps.getParameter<InputTag>("HERecHitLabel");
   endcapRawSuperClusterCollection_ = ps.getParameter<edm::InputTag>("endcapRawSuperClusterCollection");
+  muonCollection_   = consumes<MuonCollection>                    (ps.getParameter<InputTag>("MuonLabel"));
   IsCosmic_         = ps.getUntrackedParameter<bool>("IsCosmic", false);
 
   //map<string,double> providedParameters;
@@ -523,7 +527,7 @@ void CollisionAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup&
   // vertex
   nVtx = 0;
   Handle<VertexCollection> recVtxs;
-  if (iEvent.getByLabel(vtxlabel_, recVtxs)) {
+  if (iEvent.getByToken(vtxLabel_, recVtxs)) {
     
     for (unsigned int i=0; i<recVtxs->size(); ++i) 
       if (!((*recVtxs)[i].isFake())) {
@@ -542,7 +546,7 @@ void CollisionAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup&
   nRH = 0;
   Handle<ESDigiCollection> digis;
   Handle<ESRecHitCollection> ESRecHit;
-  if ( iEvent.getByLabel(rechitlabel_, ESRecHit) ) {
+  if ( iEvent.getByToken(rechitlabel_, ESRecHit) ) {
     
     for (ESRecHitCollection::const_iterator hitItr = ESRecHit->begin(); hitItr != ESRecHit->end(); ++hitItr) {
       
@@ -555,7 +559,7 @@ void CollisionAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup&
       rh_ADC1[nRH] = -1;
       rh_ADC2[nRH] = -1;
  
-      if ( iEvent.getByLabel(digilabel_, digis) ) {
+      if ( iEvent.getByToken(digilabel_, digis) ) {
 	
 	for (ESDigiCollection::const_iterator digiItr = digis->begin(); digiItr != digis->end(); ++digiItr) {
 	  
@@ -596,7 +600,7 @@ void CollisionAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup&
 
   if (!isData) {
      Handle<GenParticleCollection> genParticles;
-     iEvent.getByLabel("genParticles", genParticles);
+     iEvent.getByToken(genParticlesCollection_, genParticles);
      const GenParticleCollection *mcParticle = genParticles.product();
      
      for (GenParticleCollection::const_iterator aMC = mcParticle->begin(); aMC != mcParticle->end(); aMC++) {
@@ -640,7 +644,7 @@ void CollisionAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup&
      map<ESDetId, double> map_essimhit; 
      map<ESDetId, double>::const_iterator i_map_essimhit;
      Handle<PCaloHitContainer> EcalHitsES;
-     iEvent.getByLabel(esSimHits_, EcalHitsES);
+     iEvent.getByToken(esSimHits_, EcalHitsES);
 
      vector<PCaloHit> theESCaloHits;
      if ( EcalHitsES.isValid() ) {
@@ -691,7 +695,7 @@ void CollisionAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup&
   // Get muon's information
   nMu = 0;
   Handle<reco::MuonCollection> Muons;
-  if ( iEvent.getByLabel("muons", Muons)) {
+  if ( iEvent.getByToken(muonCollection_, Muons)) {
     const reco::MuonCollection *muons = Muons.product();
     for (reco::MuonCollection::const_iterator aMu = muons->begin(); aMu != muons->end(); aMu++) {
 
@@ -747,7 +751,7 @@ void CollisionAnalyzer::analyze(const edm::Event& iEvent, const edm::EventSetup&
 
   // Get Tracker track's information
   Handle<reco::TrackCollection> Tracks;
-  if (iEvent.getByLabel(tracklabel_, Tracks)) {
+  if (iEvent.getByToken(tracklabel_, Tracks)) {
     const reco::TrackCollection *track = Tracks.product();
     
     trkQuality_ = reco::TrackBase::qualityByName("highPurity");
