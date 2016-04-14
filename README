@@ -28,3 +28,12 @@ work forder is MyAnalyzer/ESAnalyzer/test/Run_lxbatch_jobs
      prepare list of .root files as in runList_LSF.txt
      prepare jobs with "perl launchJobs_lxbatch_LSF.pl params_lxbatch.CFG"
      launch jobs with "source launch.sh"
+
+
+>>> sequence to run timing analysis and get ladder-timingOffset maps
+- run ntuples
+- run xTimingSensor.C (via test/collisions/job_batch: python script.py)
+- run doMapTiming.cpp (in test/collisions/InterpretAndPlot)
+- run doMappe.C (in test/collisions/InterpretAndPlot)
+- run readMappe.cpp (in test/collisions/InterpretAndPlot)
+(last part could be further optimized but ok)
