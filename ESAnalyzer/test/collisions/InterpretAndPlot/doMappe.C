@@ -1,16 +1,21 @@
 #include <iomanip>
 #include <iostream>
 //to be run after doMapTiming.cpp
+// root
+// .L doMappe.C
+//doMappe(nRUN, Z, P)
 
-
-void doMappe()
+void doMappe(int nRUN, int Zval, int Pval)
 {
   gStyle->SetPaintTextFormat("1.1f");
   gStyle->SetMarkerSize(0.7);
 
+  std::cout << " nRUN = " << nRUN << std::endl;
+  std::cout << " Zval = " << Zval << " Pval = " << Pval << " options 11 10 01 00" << std::endl;
 
-  //  TFile *fout = TFile::Open("Ming_timingMap_245192_v2.root", "read");
-  TFile *fout = TFile::Open("Ming_timingMap_beamsplash_timing_00268006.root", "read");
+
+  TFile *fout = TFile::Open(Form("Ming_timingMap_AllRuns_%d.root", nRUN), "read");
+  //  TFile *fout = TFile::Open("Ming_timingMap_beamsplash_timing_00268006.root", "read");
 
 
   TH2F* mapT[2][2];
@@ -19,8 +24,6 @@ void doMappe()
   TH2F* mapTChi2[2][2];
 
   //choose among:  11  10  01  00
-  int Zval = 1;
-  int Pval = 1;
 
   //read ES sensor map
   std::vector<int> ES_Z;
@@ -44,7 +47,7 @@ void doMappe()
   }
 
 
-  std::ofstream outFile(Form("dataMap/timingSensor_beamsplash_00268006_Z%dP%d.txt", Zval, Pval), std::ios::out);
+  std::ofstream outFile(Form("dataMap/timingSensor_%d_Z%dP%d.txt", nRUN, Zval, Pval), std::ios::out);
   int cLine = 0;
   for(int i=Zval; i<Zval+1; ++i){
     for(int j=Pval; j<Pval+1; ++j) {

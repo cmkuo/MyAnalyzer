@@ -44,14 +44,15 @@ int main(){
 
 
   //  TFile* fHistos = TFile::Open("coll_timing_Run_245137_246092_MinB_hadded.root", "read");
-  TFile* fHistos = TFile::Open("./collision_Ming_timing_245192_rejectedHits.root", "read");
+  //  TFile* fHistos = TFile::Open("./collision_Ming_timing_245192_rejectedHits.root", "read");
+  TFile* fHistos = TFile::Open("/tmp/amartell/coll_timing_run268955.root", "read");
 
   TH1F* hT[2][2][40][40];
-  TH1F* hTiming[2][2];
+  //  TH1F* hTiming[2][2];
   for (int i=0; i<2; ++i) 
     for (int j=0; j<2; ++j) {
 
-      hTiming[i][j] = (TH1F*)fHistos->Get(Form("Z%d_P%d", i, j));
+      //      hTiming[i][j] = (TH1F*)fHistos->Get(Form("Z%d_P%d", i, j));
 
       for (int k=0; k<40; ++k)
 	for (int m=0; m<40; ++m) {

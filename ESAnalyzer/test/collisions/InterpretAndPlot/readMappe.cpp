@@ -1,5 +1,5 @@
 //g++ -Wall -o readMappe `root-config --cflags --glibs` readMappe.cpp
-// ./readMappe Zside Pside
+// ./readMappe nRUN Zside Pside
 //to run as last
 
 
@@ -41,17 +41,21 @@
 //void doMappe()
 int main(int argc, char* argv[])
 {
+  std::string nRUN_s = std::string(argv[1]);
+  int nRUN = atoi(argv[1]);
+  std::cout << " >>> nRUN = " << nRUN << std::endl;
 
-  std::string Zside = std::string(argv[1]);
-  int Zside_i = atoi(argv[1]);
+  std::string Zside = std::string(argv[2]);
+  int Zside_i = atoi(argv[2]);
   std::cout << " >>> Zside = " << Zside << std::endl;
 
-  std::string Pside = std::string(argv[2]);
-  int Pside_i = atoi(argv[2]);
+  std::string Pside = std::string(argv[3]);
+  int Pside_i = atoi(argv[3]);
   std::cout << " >>> Pside = " << Pside << std::endl;
 
-  gROOT->ProcessLine(".L /Users/Arabella/Public/RootLogon/rootLogon.C");
-  gROOT->ProcessLine(".x /Users/Arabella/Public/RootLogon/rootPalette.C");
+  gROOT->Macro("~/public/setStyle.C");
+  //  gROOT->ProcessLine(".L /Users/Arabella/Public/RootLogon/rootLogon.C");
+  //  gROOT->ProcessLine(".x /Users/Arabella/Public/RootLogon/rootPalette.C");
 
   //  gStyle->SetPalette( 1, 0 );
   //  gStyle->SetOptStat(0,0,0,0);
@@ -76,7 +80,7 @@ int main(int argc, char* argv[])
   std::ifstream inFileTime;
   //  inFileTime.open(Form("SensorLadder_map/timingSensor_Z%dP%d.txt", Zside_i, Pside_i), std::ios::in);
   //  inFileTime.open(Form("SensorLadder_map/timingSensor_RunB_LG_Z%dP%d.txt", Zside_i, Pside_i), std::ios::in);
-  inFileTime.open(Form("dataMap/timingSensor_beamsplash_00268006_Z%dP%d.txt", Zside_i, Pside_i), std::ios::in);
+  inFileTime.open(Form("dataMap/timingSensor_%d_Z%dP%d.txt", nRUN, Zside_i, Pside_i), std::ios::in);
 
   int line = 0;
   std::ifstream inFileLong;
@@ -110,7 +114,7 @@ int main(int argc, char* argv[])
 
   //  std::ifstream inFileLong;
   //  inFileTime.open(Form("SensorLadder_map/timingSensor_Z%dP%d.txt", Zside_i, Pside_i), std::ios::in);
-  inFileTime.open(Form("dataMap/timingSensor_beamsplash_00268006_Z%dP%d.txt", Zside_i, Pside_i), std::ios::in);
+  inFileTime.open(Form("dataMap/timingSensor_%d_Z%dP%d.txt", nRUN, Zside_i, Pside_i), std::ios::in);
   inFileLong.open(Form("SensorLadder_map/outMap_Z%dP%d.txt", Zside_i, Pside_i), std::ios::in);
   while (!inFileLong.eof())
     {
@@ -124,7 +128,7 @@ int main(int argc, char* argv[])
       if(time > -900){
 	map_Z0P0->Fill(iX, iY, lad_time[iL] / lad_N[iL]);
 	map_Z0P0_check->Fill(iX, iY, time);
-	//print ladder timing
+	//print ladder timing if offset > 1ns
 	if( fabs(lad_time[iL] / lad_N[iL]) > 1 && iL != iL_pre && iT_pre != (lad_time[iL] / lad_N[iL])){
 	  std::cout << iZ << " \t " << iP << " \t " << iL << " \t " <<  lad_time[iL] / lad_N[iL] << std::endl;
 	  iL_pre = iL;
