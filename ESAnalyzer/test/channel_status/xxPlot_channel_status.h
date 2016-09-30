@@ -156,6 +156,9 @@ void drawBorders( int plane, float sx, float sy ) {
 
 void xPlot_channel_status_(const char* hname) {
 	gStyle->SetOptStat(0);
+	Int_t colors[] = {0, 2}; // #colors >= #levels - 1
+	gStyle->SetPalette((sizeof(colors)/sizeof(Int_t)), colors);
+	
 	TH2F *CS_PF = new TH2F("CS_PF","Channel Status ES+F",40,1,41,40,1,41);
 	TH2F *CS_NF = new TH2F("CS_NF","Channel Status ES-F",40,1,41,40,1,41);
 	TH2F *CS_PR = new TH2F("CS_PR","Channel Status ES+R",40,1,41,40,1,41);
