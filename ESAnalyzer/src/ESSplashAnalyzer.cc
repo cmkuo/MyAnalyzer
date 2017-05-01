@@ -48,8 +48,8 @@ class ESSplashAnalyzer : public edm::EDAnalyzer {
   string hotFile_;
   EDGetTokenT<ESDigiCollection> digilabel_;
   EDGetTokenT<EcalRecHitCollection> rechitlabel_;
-  InputTag eerechitlabel_;
-  InputTag herechitlabel_;
+  EDGetTokenT<EERecHitCollection> eerechitlabel_;
+  EDGetTokenT<HBHERecHitCollection> herechitlabel_;
   bool dumpTree_;
   FileInPath lookup_;
 
@@ -82,8 +82,8 @@ ESSplashAnalyzer::ESSplashAnalyzer(const edm::ParameterSet& ps) {
   hotFile_        = ps.getUntrackedParameter<string>("HotChannelFile");
   digilabel_      = consumes<ESDigiCollection>(ps.getParameter<InputTag>("DigiLabel"));
   rechitlabel_    = consumes<EcalRecHitCollection>(ps.getParameter<InputTag>("RecHitLabel"));
-  eerechitlabel_  = ps.getParameter<InputTag>("EERecHitLabel");
-  herechitlabel_  = ps.getParameter<InputTag>("HERecHitLabel");
+  eerechitlabel_  = consumes<EERecHitCollection>(ps.getParameter<InputTag>("EERecHitLabel"));
+  herechitlabel_  = consumes<HBHERecHitCollection>(ps.getParameter<InputTag>("HERecHitLabel"));
   lookup_         = ps.getUntrackedParameter<FileInPath>("LookupTable");
   dumpTree_       = ps.getUntrackedParameter<bool>("DumpTree", false);
   NumberOfESHitsThreshold_ = ps.getUntrackedParameter<int>("NumberOfESHitsThreshold", 0);
@@ -354,7 +354,7 @@ void ESSplashAnalyzer::analyze(const edm::Event& e, const edm::EventSetup& iSetu
 
   // EE RecHits
   Handle<EERecHitCollection> EERecHit;
-  if ( e.getByLabel(eerechitlabel_, EERecHit) ) {
+  if ( e.getByToken(eerechitlabel_, EERecHit) ) {
 
     for (EERecHitCollection::const_iterator eehitItr = EERecHit->begin(); eehitItr != EERecHit->end(); ++eehitItr) {
 
@@ -370,7 +370,7 @@ void ESSplashAnalyzer::analyze(const edm::Event& e, const edm::EventSetup& iSetu
 
   // HE RecHits
   Handle<HBHERecHitCollection> HBHERecHit;
-  if ( e.getByLabel(herechitlabel_, HBHERecHit) ) {
+  if ( e.getByToken(herechitlabel_, HBHERecHit) ) {
     HBHERecHitCollection::const_iterator irec;
     for (irec = HBHERecHit->begin(); irec != HBHERecHit->end(); ++irec) {
       
